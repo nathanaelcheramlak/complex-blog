@@ -1,6 +1,22 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 
-const userSchema = new Schema(
+type UserType = Document & {
+  fullname: string;
+  email: string;
+  username: string;
+  password: string;
+  bio: string;
+  dateOfBirth: Date;
+  profilePicture: string;
+  blogs: Types.ObjectId[];
+  followers: Types.ObjectId[];
+  following: Types.ObjectId[];
+  liked_blogs: Types.ObjectId[];
+  commented_blogs: Types.ObjectId[];
+  bookmarked_blogs: Types.ObjectId[];
+};
+
+const userSchema: Schema = new Schema(
   {
     fullname: {
       type: String,
@@ -72,5 +88,5 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
-const User = model('User', userSchema);
+const User = model<UserType>('User', userSchema);
 export default User;

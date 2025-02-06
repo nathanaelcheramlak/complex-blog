@@ -3,6 +3,8 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerDocument from './swagger.json';
 
+import connectDB from './config/db';
+
 const app = express();
 
 const options = {
@@ -29,5 +31,6 @@ app.get('/', (req, res) => {
 
 // Start the Server
 app.listen(3000, () => {
+  connectDB();
   console.log(`Server is running on http://localhost:${3000}`);
 });

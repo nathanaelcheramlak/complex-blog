@@ -1,6 +1,11 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 
-const bookmarkSchema = new Schema(
+type BookmarkType = Document & {
+  blog: Types.ObjectId;
+  user: Types.ObjectId;
+};
+
+const bookmarkSchema: Schema = new Schema(
   {
     blog: { type: Schema.Types.ObjectId, ref: 'Blog' },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -8,6 +13,6 @@ const bookmarkSchema = new Schema(
   { timestamps: true },
 );
 
-const Bookmark = model('Bookmark', bookmarkSchema);
+const Bookmark = model<BookmarkType>('Bookmark', bookmarkSchema);
 
 export default Bookmark;

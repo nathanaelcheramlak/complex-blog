@@ -1,6 +1,12 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 
-const likeSchema = new Schema(
+type LikeType = Document & {
+  blog: Types.ObjectId;
+  user: Types.ObjectId;
+  isLiked: Boolean;
+};
+
+const likeSchema: Schema = new Schema(
   {
     blog: { type: Schema.Types.ObjectId, ref: 'Blog' },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -9,6 +15,6 @@ const likeSchema = new Schema(
   { timestamps: true },
 );
 
-const Like = model('Like', likeSchema);
+const Like = model<LikeType>('Like', likeSchema);
 
 export default Like;

@@ -1,6 +1,12 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 
-const blogSchema = new Schema(
+type BlogType = Document & {
+  title: String;
+  content: String;
+  user: Types.ObjectId;
+};
+
+const blogSchema: Schema = new Schema(
   {
     title: {
       type: String,
@@ -10,11 +16,11 @@ const blogSchema = new Schema(
       type: String,
       required: true,
     },
-    user: { type: Schema.Types.ObjectId, ref: 'User' },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true },
 );
 
-const User = model('Blog', blogSchema);
+const Blog = model<BlogType>('Blog', blogSchema);
 
-export default User;
+export default Blog;

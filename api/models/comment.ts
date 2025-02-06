@@ -1,4 +1,10 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
+
+type CommentType = Document & {
+  comment: string;
+  user: Types.ObjectId;
+  blog: Types.ObjectId;
+};
 
 const commentSchema = new Schema(
   {
@@ -18,5 +24,5 @@ const commentSchema = new Schema(
   { timestamps: true },
 );
 
-const Comment = model('Comment', commentSchema);
+const Comment = model<CommentType>('Comment', commentSchema);
 export default Comment;

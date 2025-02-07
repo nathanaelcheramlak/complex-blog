@@ -7,6 +7,13 @@ import {
   updateBlog,
 } from '../controller/blogController';
 import { createLike, deleteLike, getLikes } from '../controller/likeController';
+import {
+  createComment,
+  deleteComment,
+  getCommentById,
+  getComments,
+  updateComment,
+} from '../controller/commentController';
 
 const app = express.Router();
 
@@ -43,5 +50,16 @@ app.get('/:blogId/likes', getLikes);
 app.post('/:blogId/likes', createLike);
 
 app.delete('/:blogId/likes/:id', deleteLike);
+
+// comments
+app.get('/:blogId/comments', getComments);
+
+app.get('/:blogId/comments/:id', getCommentById);
+
+app.post('/:blogId/comments', createComment);
+
+app.put('/:blogId/comments/:id', updateComment);
+
+app.delete('/:blogId/comments/:id', deleteComment);
 
 export default app;

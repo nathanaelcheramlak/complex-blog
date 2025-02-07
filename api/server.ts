@@ -7,13 +7,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerDocument from './swagger.json';
 
 import connectDB from './config/db';
-import {
-  authRoutes,
-  userRoutes,
-  blogRoutes,
-  bookmarkRoutes,
-  commentRoutes,
-} from './routes/routes';
+import { authRoutes, userRoutes, blogRoutes } from './routes/routes';
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -58,10 +52,8 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/blogs', blogRoutes);
-app.use('/bookmarks', bookmarkRoutes);
-app.use('/comments', commentRoutes);
+app.use('/user', userRoutes);
+app.use('/blog', blogRoutes);
 
 // Start the Server
 app.listen(PORT, () => {

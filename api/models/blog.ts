@@ -4,6 +4,8 @@ type BlogType = Document & {
   title: String;
   content: String;
   user: Types.ObjectId;
+  likes: Types.ObjectId[];
+  comments: Types.ObjectId[];
 };
 
 const blogSchema: Schema = new Schema(
@@ -16,7 +18,9 @@ const blogSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    likes: [{ type: Schema.Types.ObjectId, ref: 'Like' }],
+    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   },
   { timestamps: true },
 );

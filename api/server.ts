@@ -21,11 +21,6 @@ const PORT = process.env.PORT || 5000;
 
 const app = express();
 
-// Config
-app.use(express.json());
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
-
 // CORS Config
 app.use(
   cors({
@@ -34,14 +29,20 @@ app.use(
     exposedHeaders: ['set-cookie'],
   }),
 );
+app.options('*', cors()); // Handle preflight requests
+
+// Config
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 // Swagger Config
 const options = {
   swaggerDefinition: swaggerDocument,
-  apis: ['./server.ts'], // Path to the API docs
+  apis: ['./server.ts', './routes/*.ts'], // Path to the API docs
 };
 const specs = swaggerJsdoc(options);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+app.use('/api-docs', cors(), swaggerUi.serve, swaggerUi.setup(specs));
 
 /**
  * @swagger

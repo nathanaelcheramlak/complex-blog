@@ -13,7 +13,6 @@ import {
   blogRoutes,
   bookmarkRoutes,
   commentRoutes,
-  likeRoutes,
 } from './routes/routes';
 
 dotenv.config();
@@ -63,7 +62,6 @@ app.use('/users', userRoutes);
 app.use('/blogs', blogRoutes);
 app.use('/bookmarks', bookmarkRoutes);
 app.use('/comments', commentRoutes);
-app.use('/likes', likeRoutes);
 
 // Start the Server
 app.listen(PORT, () => {

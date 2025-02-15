@@ -1,4 +1,4 @@
 export type SortByQuery = {
   sortBy: 'date' | 'likes';
-  order: 1 | -1;
+  order: 'asc' | 'desc';
 };

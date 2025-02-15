@@ -1,11 +1,24 @@
-import { Types } from 'mongoose';
+import { Types, Document } from 'mongoose';
+import { LikeType, CommentType } from './model';
 
-export type BlogType = Document & {
-  title: String;
-  content: String;
+export type BlogTypeSorted = {
+  title: string;
+  content: string;
+  user: {
+    _id: Types.ObjectId;
+    username: string;
+    fullname: string;
+    profilePicture: string;
+  };
+  likes: number;
+};
+
+export type PopulatedBlogType = Document & {
+  title: string;
+  content: string;
   user: Types.ObjectId;
-  likes: Types.ObjectId[];
-  comments: Types.ObjectId[];
+  likes: LikeType[];
+  comments: CommentType[];
 };
 
 export type ErrorType = {

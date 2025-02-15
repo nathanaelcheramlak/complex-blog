@@ -1,15 +1,38 @@
 import { Request, Response } from 'express';
 import Blog from '../models/blog';
 import type { BlogType } from '../types/model';
-import type { PopulatedBlogType, ErrorType } from '../types/response';
+import type {
+  BlogTypeSorted,
+  PopulatedBlogType,
+  ErrorType,
+} from '../types/response';
 import type { CreateBlogDto } from '../dtos/CreateBlog.dto';
+import { SortByQuery } from '../types/query_params';
 
 export const getBlogs = async (
-  request: Request,
-  response: Response<BlogType[] | ErrorType>,
+  request: Request<{}, {}, {}, SortByQuery>,
+  response: Response<BlogTypeSorted[] | ErrorType>,
 ) => {
   try {
-    const blogs = await Blog.find();
+    const { sortBy, order } = request.query;
+
+    let blogs: BlogTypeSorted[] = [];
+
+    if (sortBy === 'date') {
+      blogs = (await Blog.find()
+        .sort({ createdAt: order })
+        .populate('user', '_id username fullname profilePicture')
+        .lean()) as unknown as BlogTypeSorted[];
+    } else if (sortBy === 'likes') {
+      blogs = (await Blog.find()
+        .sort({ likes: order })
+        .populate('user', '_id username fullname profilePicture')
+        .lean()) as unknown as BlogTypeSorted[];
+    } else {
+      blogs = (await Blog.find()
+        .populate('user', '_id username fullname profilePicture')
+        .lean()) as unknown as BlogTypeSorted[];
+    }
 
     response.status(200).json(blogs);
   } catch (error: unknown) {

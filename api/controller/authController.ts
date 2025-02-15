@@ -37,7 +37,13 @@ export const login: RequestHandler = async (
 
     // Set the auth token
     setAuthCookie(res, { id: user.id, username: user.username });
-    res.json({ message: 'Login successfully', error: false });
+    const userDTO = {
+      id: user.id,
+      fullname: user.fullname,
+      email: user.email,
+      username: user.username,
+    };
+    res.json({ message: 'Login successfully', error: false, data: userDTO });
     return;
   } catch (error) {
     res.status(500).json({ message: 'Internal server error', error: true });
@@ -79,7 +85,17 @@ export const register: RequestHandler = async (
 
     await newUser.save();
     setAuthCookie(res, { id: newUser.id, username: newUser.username });
-    res.json({ message: 'User created successfully', error: false });
+    const userDTO = {
+      id: newUser.id,
+      fullname: newUser.fullname,
+      email: newUser.email,
+      username: newUser.username,
+    };
+    res.json({
+      message: 'User created successfully',
+      error: false,
+      data: userDTO,
+    });
     return;
   } catch (error) {
     res.status(500).json({ message: 'Internal server error', error: true });

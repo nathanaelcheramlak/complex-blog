@@ -1,12 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-
-type BlogType = Document & {
-  title: String;
-  content: String;
-  user: Types.ObjectId;
-  likes: Types.ObjectId[];
-  comments: Types.ObjectId[];
-};
+import type { BlogType } from '../types/model';
 
 const blogSchema: Schema = new Schema(
   {

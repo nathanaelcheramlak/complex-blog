@@ -1,20 +1,5 @@
-import { Schema, model, Document, Types } from 'mongoose';
-
-type UserType = Document & {
-  fullname: string;
-  email: string;
-  username: string;
-  password: string;
-  bio: string;
-  dateOfBirth: Date;
-  profilePicture: string;
-  blogs: Types.ObjectId[];
-  followers: Types.ObjectId[];
-  following: Types.ObjectId[];
-  liked_blogs: Types.ObjectId[];
-  commented_blogs: Types.ObjectId[];
-  bookmarked_blogs: Types.ObjectId[];
-};
+import { Schema, model } from 'mongoose';
+import type { UserType } from '../types/model';
 
 const userSchema: Schema = new Schema(
   {

@@ -1,9 +1,5 @@
-import { Schema, model, Document, Types } from 'mongoose';
-
-type LikeType = Document & {
-  blog: Types.ObjectId;
-  user: Types.ObjectId;
-};
+import { Schema, model } from 'mongoose';
+import type { LikeType } from '../types/model';
 
 const likeSchema: Schema = new Schema(
   {

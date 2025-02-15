@@ -1,9 +1,5 @@
-import { Schema, model, Document, Types } from 'mongoose';
-
-type BookmarkType = Document & {
-  blog: Types.ObjectId;
-  user: Types.ObjectId;
-};
+import { Schema, model } from 'mongoose';
+import type { BookmarkType } from '../types/model';
 
 const bookmarkSchema: Schema = new Schema(
   {

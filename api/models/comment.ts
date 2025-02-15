@@ -1,10 +1,5 @@
-import { Schema, model, Document, Types } from 'mongoose';
-
-type CommentType = Document & {
-  comment: string;
-  user: Types.ObjectId;
-  blog: Types.ObjectId;
-};
+import { Schema, model } from 'mongoose';
+import type { CommentType } from '../types/model';
 
 const commentSchema = new Schema(
   {

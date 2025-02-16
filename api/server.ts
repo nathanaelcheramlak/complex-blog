@@ -8,6 +8,7 @@ import swaggerDocument from './swagger.json';
 
 import connectDB from './config/db';
 import { authRoutes, userRoutes, blogRoutes } from './routes/routes';
+import { authenticateJWT } from './utils/verifyToken';
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -52,8 +53,8 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/blogs', blogRoutes);
+app.use('/users', authenticateJWT, userRoutes);
+app.use('/blogs', authenticateJWT, blogRoutes);
 
 // Start the Server
 app.listen(PORT, () => {

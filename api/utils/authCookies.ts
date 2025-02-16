@@ -16,5 +16,5 @@ export const setAuthCookie = (res: Response, user: UserPayload): void => {
 };
 
 export const clearAuthToken = (res: Response): void => {
-  res.clearCookie('auth_token', cookieOptions);
+  res.clearCookie('auth_token', { ...cookieOptions, maxAge: 0 });
 };

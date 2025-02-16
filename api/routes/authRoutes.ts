@@ -5,14 +5,17 @@ import {
   forgotPassword,
   logout,
   me,
+  resetPassword,
 } from '../controller/authController';
+import { authenticateJWT } from '../utils/verifyToken';
 
 const app = express.Router();
 
 app.post('/login', login);
 app.post('/register', register);
-app.post('/forgot-password', forgotPassword);
 app.delete('/logout', logout);
-app.get('/me', me);
+app.post('/forgot-password', forgotPassword);
+app.post('reset-password', resetPassword);
+app.get('/me', authenticateJWT, me);
 
 export default app;

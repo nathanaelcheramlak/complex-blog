@@ -8,6 +8,8 @@ export type UserType = Document & {
   bio: string;
   dateOfBirth: Date;
   profilePicture: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpires?: Date | null;
   blogs: Types.ObjectId[];
   followers: Types.ObjectId[];
   following: Types.ObjectId[];

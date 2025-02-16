@@ -33,6 +33,8 @@ const userSchema: Schema = new Schema(
       type: String,
       default: '',
     },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
     blogs: [
       {
         type: Schema.Types.ObjectId,

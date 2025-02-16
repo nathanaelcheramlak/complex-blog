@@ -14,7 +14,6 @@ import {
   getComments,
   updateComment,
 } from '../controller/commentController';
-import { authenticateJWT } from '../utils/verifyToken';
 
 const app = express.Router();
 
@@ -34,33 +33,33 @@ const app = express.Router();
  *            $ref: '#/components/schemas/Blog'
  *
  */
-app.get('/', authenticateJWT, getBlogs);
+app.get('/', getBlogs);
 
-app.get('/:id', authenticateJWT, getBlogById);
+app.get('/:id', getBlogById);
 
-app.post('/', authenticateJWT, createBlog);
+app.post('/', createBlog);
 
-app.put('/:id', authenticateJWT, updateBlog);
+app.put('/:id', updateBlog);
 
-app.delete('/:id', authenticateJWT, deleteBlog);
+app.delete('/:id', deleteBlog);
 
 // Likes
 
-app.get('/:blogId/likes', authenticateJWT, getLikes);
+app.get('/:blogId/likes', getLikes);
 
-app.post('/:blogId/likes', authenticateJWT, createLike);
+app.post('/:blogId/likes', createLike);
 
-app.delete('/:blogId/likes/:id', authenticateJWT, deleteLike);
+app.delete('/:blogId/likes/:id', deleteLike);
 
 // comments
-app.get('/:blogId/comments', authenticateJWT, getComments);
+app.get('/:blogId/comments', getComments);
 
-app.get('/:blogId/comments/:id', authenticateJWT, getCommentById);
+app.get('/:blogId/comments/:id', getCommentById);
 
-app.post('/:blogId/comments', authenticateJWT, createComment);
+app.post('/:blogId/comments', createComment);
 
-app.put('/:blogId/comments/:id', authenticateJWT, updateComment);
+app.put('/:blogId/comments/:id', updateComment);
 
-app.delete('/:blogId/comments/:id', authenticateJWT, deleteComment);
+app.delete('/:blogId/comments/:id', deleteComment);
 
 export default app;

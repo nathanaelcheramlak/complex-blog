@@ -53,7 +53,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/auth', authRoutes);
-app.use('/users', authenticateJWT, userRoutes);
+app.use('/users', userRoutes);
 app.use('/blogs', blogRoutes);
 
 // Start the Server

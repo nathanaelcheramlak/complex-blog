@@ -14,6 +14,7 @@ import {
   getComments,
   updateComment,
 } from '../controller/commentController';
+import { authenticateJWT } from '../utils/verifyToken';
 
 const app = express.Router();
 
@@ -21,7 +22,7 @@ app.get('/', getBlogs);
 
 app.get('/:id', getBlogById);
 
-app.post('/', createBlog);
+app.post('/', authenticateJWT, createBlog);
 
 app.put('/:id', updateBlog);
 

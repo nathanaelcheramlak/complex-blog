@@ -54,7 +54,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/auth', authRoutes);
 app.use('/users', authenticateJWT, userRoutes);
-app.use('/blogs', authenticateJWT, blogRoutes);
+app.use('/blogs', blogRoutes);
 
 // Start the Server
 app.listen(PORT, () => {

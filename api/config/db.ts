@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import '../models/user';
+import '../models/blog';
+import '../models/comment';
+import '../models/like';
+import '../models/bookmark';
 
 dotenv.config();
 

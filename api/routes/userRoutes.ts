@@ -12,11 +12,12 @@ import {
   deleteBookmark,
   getBookmarks,
 } from '../controller/userController';
+import { authenticateJWT } from '../utils/verifyToken';
 
 const app = express.Router();
 
 // User Routes
-app.get('/', getUser);
+app.get('/', authenticateJWT, getUser);
 app.get('/:id', getUserById);
 app.put('/', editUser);
 app.delete('/', deleteUser);

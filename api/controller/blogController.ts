@@ -158,6 +158,39 @@ export const updateBlog = async (
   }
 };
 
-export const deleteBlog = async (request: Request, response: Response) => {
-  response.status(200).json({});
+export const deleteBlog = async (
+  request: CustomRequest<{ id: string }, {}, {}>,
+  response: Response<{ message: string } | ErrorType>,
+) => {
+  const userId = request.user?.id;
+  const { id } = request.params;
+
+  if (!userId) {
+    response.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const blog = await Blog.findById(id);
+
+    if (!blog) {
+      response.status(404).json({ message: 'Blog not found' });
+      return;
+    }
+
+    if (blog.author.toString() !== userId) {
+      response.status(403).json({ message: 'You are not authorized' });
+      return;
+    }
+
+    await blog.deleteOne();
+
+    response.status(204);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+    } else {
+      response.status(500).json({ message: 'An unknown error occurred.' });
+    }
+  }
 };

@@ -5,36 +5,36 @@ import { setAuthCookie, clearAuthToken } from '../utils/authCookies';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail';
 import { AuthenticatedRequest } from '../types/request';
+import { ErrorType, UserProfile } from '../types/response';
+import { matchedData, validationResult } from 'express-validator';
 
 export const login: RequestHandler = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-    const { email, username, password } = req.body;
-
-    // Validation
-    if (!email && !username) {
-      res.status(400).json({ message: 'Email or username is required' });
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      res
+        .status(400)
+        .json({ message: result.array().map((error) => error.msg) });
       return;
     }
-    if (!password) {
-      res.status(400).json({ message: 'Password is required' });
-      return;
-    }
+    const { email, username, password } = matchedData(req);
+    console.log(email, username, password);
 
     // Check if the user exists by email or username
     const user = await User.findOne({ $or: [{ email }, { username }] });
 
     if (!user) {
-      res.status(404).json({ message: 'Invalid Credentials.', error: true });
+      res.status(404).json({ message: 'Invalid Credentials.(NO)' });
       return;
     }
 
     // Check if the password is correct
     const isMatch = await compare(password, user.password);
     if (!isMatch) {
-      res.status(400).json({ message: 'Invalid credentials', error: true });
+      res.status(400).json({ message: 'Invalid credentials' });
       return;
     }
 
@@ -49,22 +49,31 @@ export const login: RequestHandler = async (
     res.json({ message: 'Login successfully', error: false, data: userDTO });
     return;
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error: true });
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+      return;
+    } else {
+      res.status(500).json({ message: 'An unknown error occurred' });
+      return;
+    }
   }
 };
 
 export const register: RequestHandler = async (
   req: Request,
-  res: Response,
+  res: Response<UserProfile | ErrorType>,
 ): Promise<void> => {
   try {
-    const { fullname, email, username, password, dateOfBirth } = req.body;
-
-    // Validation
-    if (!fullname || !email || !username || !password || !dateOfBirth) {
-      res.status(400).json({ message: 'All fields are required' });
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      res
+        .status(400)
+        .json({ message: result.array().map((error) => error.msg) });
       return;
     }
+
+    const { fullname, email, username, password, dateOfBirth } =
+      matchedData(req);
 
     // Check if the user exists
     const user = await User.findOne({ $or: [{ email }, { username }] });
@@ -88,20 +97,20 @@ export const register: RequestHandler = async (
 
     await newUser.save();
     setAuthCookie(res, { id: newUser.id, username: newUser.username });
-    const userDTO = {
-      id: newUser.id,
-      fullname: newUser.fullname,
-      email: newUser.email,
+    const userProfile: UserProfile = {
+      _id: newUser._id,
       username: newUser.username,
+      email: newUser.email,
+      dateOfBirth: newUser.dateOfBirth,
+      fullname: newUser.fullname,
+      bio: newUser.bio,
+      profilePicture: newUser.profilePicture,
     };
-    res.json({
-      message: 'User created successfully',
-      error: false,
-      data: userDTO,
-    });
+
+    res.json(userProfile);
     return;
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error: true });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -132,6 +141,7 @@ export const forgotPassword: RequestHandler = async (
     user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
 
     await user.save();
+    console.log(user);
 
     // Send email with the reset token
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
@@ -143,7 +153,8 @@ export const forgotPassword: RequestHandler = async (
 
     res.json({ message: 'Reset link sent to your email', error: false });
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error: true });
+    console.log('Error from forgot password controller.', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -156,7 +167,13 @@ export const resetPassword: RequestHandler = async (
 
     // Validate password
     if (!password) {
-      res.status(400).json({ error: true, message: 'Password is required' });
+      res
+        .status(400)
+        .json({ error: true, message: 'new password is required' });
+      return;
+    }
+    if (!token) {
+      res.status(400).json({ error: true, message: 'Token is required' });
       return;
     }
 
@@ -185,40 +202,51 @@ export const resetPassword: RequestHandler = async (
     await user.save();
     res.json({ message: 'Password reset successfully', error: false });
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error: true });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 export const logout: RequestHandler = async (
   req: Request,
-  res: Response,
+  res: Response<{ message: string } | ErrorType>,
 ): Promise<void> => {
   try {
     clearAuthToken(res);
-    res.json({ message: 'Logout successfully', error: false });
+    res.status(204).json({ message: 'Logout successfully' });
     return;
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error: true });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 export const me: RequestHandler = async (
   req: AuthenticatedRequest,
-  res: Response,
+  res: Response<UserProfile | ErrorType>,
 ): Promise<void> => {
   try {
     if (!req.user) {
-      res.status(401).json({ message: 'Unauthorized', error: true });
+      res.status(401).json({ message: 'Unauthorized' });
       return;
     }
     const userId = req.user.id;
     const user = await User.findById(userId).select('-password');
     if (!user) {
-      res.status(404).json({ message: 'User not found', error: true });
+      res.status(404).json({ message: 'User not found' });
       return;
     }
-    res.json({ message: 'User found', error: false, data: user });
+
+    const userProfile: UserProfile = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      dateOfBirth: user.dateOfBirth,
+      fullname: user.fullname,
+      bio: user.bio,
+      profilePicture: user.profilePicture,
+    };
+
+    res.status(200).json(userProfile);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error: true });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };

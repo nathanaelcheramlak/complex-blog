@@ -21,6 +21,16 @@ export type PopulatedBlogType = Document & {
   comments: CommentType[];
 };
 
+export type UserProfile = {
+  _id: any;
+  username: string;
+  email: string;
+  dateOfBirth: Date;
+  fullname: string;
+  bio: string;
+  profilePicture: string;
+};
+
 export type ErrorType = {
-  message: string;
+  message: string | string[];
 };

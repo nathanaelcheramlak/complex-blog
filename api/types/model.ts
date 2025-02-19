@@ -21,7 +21,7 @@ export type UserType = Document & {
 export type BlogType = Document & {
   title: String;
   content: String;
-  user: Types.ObjectId;
+  author: Types.ObjectId;
   likes: Types.ObjectId[];
   comments: Types.ObjectId[];
 };

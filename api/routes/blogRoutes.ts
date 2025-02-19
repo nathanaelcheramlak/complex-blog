@@ -17,22 +17,6 @@ import {
 
 const app = express.Router();
 
-/**
- * @swagger
- * /blogs:
- *  get:
- *   summary: Get all blogs
- *  responses:
- *   200:
- *    description: Returns all blogs
- *    content:
- *      application/json:
- *        schema:
- *          type: array
- *          items:
- *            $ref: '#/components/schemas/Blog'
- *
- */
 app.get('/', getBlogs);
 
 app.get('/:id', getBlogById);

@@ -6,7 +6,7 @@ import type {
   PopulatedBlogType,
   ErrorType,
 } from '../types/response';
-import type { CreateBlogDto } from '../dtos/CreateBlog.dto';
+import type { CreateBlogDto, UpdateBlogDto } from '../dtos';
 import { SortByQuery } from '../types/query_params';
 import { CustomRequest } from '../types/request';
 

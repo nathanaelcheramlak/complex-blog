@@ -21,16 +21,16 @@ export const getBlogs = async (
     if (sortBy === 'date') {
       blogs = (await Blog.find()
         .sort({ createdAt: order === 'asc' ? 1 : -1 })
-        .populate('user', '_id username fullname profilePicture')
+        .populate('author', '_id username fullname profilePicture')
         .lean()) as unknown as BlogTypeSorted[];
     } else if (sortBy === 'likes') {
       blogs = (await Blog.find()
         .sort({ likes: order === 'asc' ? 1 : -1 })
-        .populate('user', '_id username fullname profilePicture')
+        .populate('author', '_id username fullname profilePicture')
         .lean()) as unknown as BlogTypeSorted[];
     } else {
       blogs = (await Blog.find()
-        .populate('user', '_id username fullname profilePicture')
+        .populate('author', '_id username fullname profilePicture')
         .lean()) as unknown as BlogTypeSorted[];
     }
 

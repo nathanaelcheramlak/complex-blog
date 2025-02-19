@@ -8,6 +8,7 @@ import type {
 } from '../types/response';
 import type { CreateBlogDto } from '../dtos/CreateBlog.dto';
 import { SortByQuery } from '../types/query_params';
+import { CustomRequest } from '../types/request';
 
 export const getBlogs = async (
   request: Request<{}, {}, {}, SortByQuery>,
@@ -70,8 +71,40 @@ export const getBlogById = async (
   }
 };
 
-export const createBlog = async (request: Request, response: Response) => {
-  response.status(200).json({});
+export const createBlog = async (
+  request: CustomRequest<{}, {}, CreateBlogDto>,
+  response: Response<BlogType | ErrorType>,
+) => {
+  const userId = request.user?.id;
+  const { title, content } = request.body;
+
+  if (!userId) {
+    response.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+  if (!title || !content) {
+    response.status(400).json({ message: 'Title and content are required' });
+    return;
+  }
+
+  try {
+    const blog = new Blog({
+      title,
+      content,
+      author: userId,
+    });
+
+    await blog.save();
+
+    response.status(201).json(blog);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+    } else {
+      response.status(500).json({ message: 'An unknown error occurred.' });
+    }
+  }
 };
 
 export const updateBlog = async (request: Request, response: Response) => {

@@ -1,13 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserPayload } from '../types/UserPayloads';
-
-interface CustomRequest extends Request {
-  user?: UserPayload;
-}
+import { CustomRequest } from '../types/request';
 
 export const authenticateJWT = async (
-  req: CustomRequest,
+  req: CustomRequest<{}, {}, {}>,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {

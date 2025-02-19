@@ -24,9 +24,9 @@ app.get('/:id', getBlogById);
 
 app.post('/', authenticateJWT, createBlog);
 
-app.put('/:id', updateBlog);
+app.put('/:id', authenticateJWT, updateBlog);
 
-app.delete('/:id', deleteBlog);
+app.delete('/:id', authenticateJWT, deleteBlog);
 
 // Likes
 

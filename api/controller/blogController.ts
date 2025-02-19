@@ -48,9 +48,9 @@ export const getBlogById = async (
   request: Request,
   response: Response<PopulatedBlogType | ErrorType>,
 ) => {
-  const { _id } = request.params;
+  const { id } = request.params;
   try {
-    const blog = (await Blog.findById(_id)
+    const blog = (await Blog.findById(id)
       .populate('likes')
       .populate('comments')
       .lean()) as PopulatedBlogType | null;

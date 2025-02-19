@@ -1,70 +1,116 @@
-import { RequestHandler, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import User from '../models/user';
+import { CustomRequest } from '../types/request'; // Import the extended type
+import { UserProfile } from '../types/response';
 
-export const getUser: RequestHandler = async (
-  req: Request,
+export const getUser = async (
+  req: CustomRequest<{}, {}, {}>,
   res: Response,
-): Promise<void> => {};
+) => {
+  try {
+    if (!req?.user) {
+      res.status(401).json({ message: 'Unauthorized', error: true });
+      return;
+    }
 
-export const getUserById: RequestHandler = async (
+    const userId = req.user?.id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found', error: true });
+      return;
+    }
+
+    const userProfile: UserProfile = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      dateOfBirth: user.dateOfBirth,
+      fullname: user.fullname,
+      bio: user.bio,
+      profilePicture: user.profilePicture,
+    };
+
+    res.status(200).json({ data: userProfile });
+  } catch (error) {
+    console.error('Error in get user controller: ', error);
+    res.status(500).json({ message: 'Internal server error', error: true });
+  }
+};
+
+export const getUserById = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const user = User.findById(id).select(
-      '-password -followers -following -blogs -liked_blogs -commented_blogs -bookmarked_blogs',
-    );
+    const user = await User.findById(id).lean();
+
     if (!user) {
       res.status(404).json({ message: 'User not found' });
+      return;
     }
-    res.status(200).json({ message: 'User found!', error: false, data: user });
+
+    const userProfile: UserProfile = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      dateOfBirth: user.dateOfBirth,
+      fullname: user.fullname,
+      bio: user.bio,
+      profilePicture: user.profilePicture,
+    };
+
+    // Send the user data
+    res.status(200).json({ data: userProfile });
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error: true });
+    console.log('Error on get user by id controller: ', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-export const editUser: RequestHandler = async (
+export const editUser = async (
   req: Request,
   res: Response,
 ): Promise<void> => {};
 
-export const deleteUser: RequestHandler = async (
+export const deleteUser = async (
   req: Request,
   res: Response,
 ): Promise<void> => {};
 
-export const getFollowers: RequestHandler = async (
+export const getFollowers = async (
   req: Request,
   res: Response,
 ): Promise<void> => {};
 
-export const getFollowing: RequestHandler = async (
+export const getFollowing = async (
   req: Request,
   res: Response,
 ): Promise<void> => {};
 
-export const followUser: RequestHandler = async (
+export const followUser = async (
   req: Request,
   res: Response,
 ): Promise<void> => {};
 
-export const unFollowUser: RequestHandler = async (
+export const unFollowUser = async (
   req: Request,
   res: Response,
 ): Promise<void> => {};
 
-export const getBookmarks: RequestHandler = async (
+export const getBookmarks = async (
   req: Request,
   res: Response,
 ): Promise<void> => {};
 
-export const addBookmark: RequestHandler = async (
+export const addBookmark = async (
   req: Request,
   res: Response,
 ): Promise<void> => {};
 
-export const deleteBookmark: RequestHandler = async (
+export const deleteBookmark = async (
   req: Request,
   res: Response,
 ): Promise<void> => {};

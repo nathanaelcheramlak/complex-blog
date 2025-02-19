@@ -107,8 +107,55 @@ export const createBlog = async (
   }
 };
 
-export const updateBlog = async (request: Request, response: Response) => {
-  response.status(200).json({});
+export const updateBlog = async (
+  request: CustomRequest<{ id: string }, {}, UpdateBlogDto>,
+  response: Response<BlogType | ErrorType>,
+) => {
+  const userId = request.user?.id;
+  const { id } = request.params;
+  const { title, content } = request.body;
+
+  if (!userId) {
+    response.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+  if (!title && !content) {
+    response.status(400).json({ message: 'Title or content are required' });
+    return;
+  }
+
+  try {
+    const blog = await Blog.findById(id);
+
+    if (!blog) {
+      response.status(404).json({ message: 'Blog not found' });
+      return;
+    }
+
+    if (blog.author.toString() !== userId) {
+      response.status(403).json({ message: 'You are not authorized' });
+      return;
+    }
+
+    if (title) {
+      blog.title = title;
+    }
+
+    if (content) {
+      blog.content = content;
+    }
+
+    await blog.save();
+
+    response.status(200).json(blog);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+    } else {
+      response.status(500).json({ message: 'An unknown error occurred.' });
+    }
+  }
 };
 
 export const deleteBlog = async (request: Request, response: Response) => {

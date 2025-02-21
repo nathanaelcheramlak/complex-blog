@@ -44,8 +44,37 @@ export const getComments = async (
   }
 };
 
-export const getCommentById = async (request: Request, response: Response) => {
-  response.status(200).json({});
+export const getCommentById = async (
+  request: Request<{ blogId: string; id: string }>,
+  response: Response<CommentTypeSorted | ErrorType>,
+) => {
+  const { blogId, id } = request.params;
+
+  try {
+    const blog = await Blog.findById(blogId);
+
+    if (!blog) {
+      response.json({ message: 'Blog not found' });
+      return;
+    }
+
+    const comment = (await Comment.findById(id)
+      .populate('user', '_id username fullname profilePicture')
+      .lean()) as unknown as CommentTypeSorted | null;
+
+    if (!comment) {
+      response.status(404).json({ message: 'Comment not found' });
+      return;
+    }
+
+    response.status(200).json(comment);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+    } else {
+      response.status(500).json({ message: 'An unknown error occurred' });
+    }
+  }
 };
 
 export const createComment = async (request: Request, response: Response) => {

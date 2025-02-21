@@ -9,6 +9,7 @@ import type {
 import type { CreateBlogDto, UpdateBlogDto } from '../dtos';
 import { SortByQuery } from '../types/query_params';
 import { CustomRequest } from '../types/request';
+import User from '../models/user';
 
 export const getBlogs = async (
   request: Request<{}, {}, {}, SortByQuery>,
@@ -89,6 +90,13 @@ export const createBlog = async (
   }
 
   try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      response.status(404).json({ message: 'User not found' });
+      return;
+    }
+
     const blog = new Blog({
       title,
       content,
@@ -96,6 +104,9 @@ export const createBlog = async (
     });
 
     await blog.save();
+
+    user.blogs.push(blog.id);
+    await user.save();
 
     response.status(201).json(blog);
   } catch (error: unknown) {

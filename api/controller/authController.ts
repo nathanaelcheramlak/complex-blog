@@ -5,23 +5,16 @@ import { setAuthCookie, clearAuthToken } from '../utils/authCookies';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail';
 import { AuthenticatedRequest } from '../types/request';
-import { ErrorType, UserProfile } from '../types/response';
-import { matchedData, validationResult } from 'express-validator';
+import { ErrorType } from '../types/response';
+import { matchedData } from 'express-validator';
+import { mapUser, UserProfileDto } from '../dtos/user.dto';
 
 export const login: RequestHandler = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-    const result = validationResult(req);
-    if (!result.isEmpty()) {
-      res
-        .status(400)
-        .json({ message: result.array().map((error) => error.msg) });
-      return;
-    }
     const { email, username, password } = matchedData(req);
-    console.log(email, username, password);
 
     // Check if the user exists by email or username
     const user = await User.findOne({ $or: [{ email }, { username }] });
@@ -40,13 +33,12 @@ export const login: RequestHandler = async (
 
     // Set the auth token
     setAuthCookie(res, { id: user.id, username: user.username });
-    const userDTO = {
-      id: user.id,
-      fullname: user.fullname,
-      email: user.email,
-      username: user.username,
-    };
-    res.json({ message: 'Login successfully', error: false, data: userDTO });
+
+    res.json({
+      message: 'Login successfully',
+      error: false,
+      user: mapUser(user),
+    });
     return;
   } catch (error) {
     if (error instanceof Error) {
@@ -61,17 +53,9 @@ export const login: RequestHandler = async (
 
 export const register: RequestHandler = async (
   req: Request,
-  res: Response<UserProfile | ErrorType>,
+  res: Response<UserProfileDto | ErrorType>,
 ): Promise<void> => {
   try {
-    const result = validationResult(req);
-    if (!result.isEmpty()) {
-      res
-        .status(400)
-        .json({ message: result.array().map((error) => error.msg) });
-      return;
-    }
-
     const { fullname, email, username, password, dateOfBirth } =
       matchedData(req);
 
@@ -97,19 +81,11 @@ export const register: RequestHandler = async (
 
     await newUser.save();
     setAuthCookie(res, { id: newUser.id, username: newUser.username });
-    const userProfile: UserProfile = {
-      _id: newUser._id,
-      username: newUser.username,
-      email: newUser.email,
-      dateOfBirth: newUser.dateOfBirth,
-      fullname: newUser.fullname,
-      bio: newUser.bio,
-      profilePicture: newUser.profilePicture,
-    };
 
-    res.json(userProfile);
+    res.json(mapUser(newUser));
     return;
   } catch (error) {
+    console.log('Error in register controller: ', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -119,12 +95,7 @@ export const forgotPassword: RequestHandler = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { email } = req.body;
-    // Validate email
-    if (!email) {
-      res.status(400).json({ error: true, message: 'Email is required' });
-      return;
-    }
+    const { email } = matchedData(req);
 
     // Check if the user exists
     const user = await User.findOne({ email });
@@ -141,7 +112,6 @@ export const forgotPassword: RequestHandler = async (
     user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
 
     await user.save();
-    console.log(user);
 
     // Send email with the reset token
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
@@ -163,19 +133,7 @@ export const resetPassword: RequestHandler = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { token, password } = req.body;
-
-    // Validate password
-    if (!password) {
-      res
-        .status(400)
-        .json({ error: true, message: 'new password is required' });
-      return;
-    }
-    if (!token) {
-      res.status(400).json({ error: true, message: 'Token is required' });
-      return;
-    }
+    const { token, password } = matchedData(req);
 
     // Check if the user exists
     const user = await User.findOne({
@@ -200,8 +158,13 @@ export const resetPassword: RequestHandler = async (
     user.resetPasswordExpires = null;
 
     await user.save();
-    res.json({ message: 'Password reset successfully', error: false });
+    res.json({
+      message: 'Password reset successfully',
+      error: false,
+      user: mapUser(user),
+    });
   } catch (error) {
+    console.log('Error in reset password controller: ', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -215,38 +178,26 @@ export const logout: RequestHandler = async (
     res.status(204).json({ message: 'Logout successfully' });
     return;
   } catch (error) {
+    console.log('Error in logout controller: ', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 export const me: RequestHandler = async (
   req: AuthenticatedRequest,
-  res: Response<UserProfile | ErrorType>,
+  res: Response<UserProfileDto | ErrorType>,
 ): Promise<void> => {
   try {
-    if (!req.user) {
-      res.status(401).json({ message: 'Unauthorized' });
-      return;
-    }
-    const userId = req.user.id;
+    const userId = req.user?.id;
     const user = await User.findById(userId).select('-password');
     if (!user) {
       res.status(404).json({ message: 'User not found' });
       return;
     }
 
-    const userProfile: UserProfile = {
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      dateOfBirth: user.dateOfBirth,
-      fullname: user.fullname,
-      bio: user.bio,
-      profilePicture: user.profilePicture,
-    };
-
-    res.status(200).json(userProfile);
+    res.status(200).json(mapUser(user));
   } catch (error) {
+    console.log('Error in get user (me) controller: ', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

@@ -31,6 +31,18 @@ export type UserProfile = {
   profilePicture: string;
 };
 
+export type CommentTypeSorted = Document & {
+  _id: Types.ObjectId;
+  content: string;
+  user: {
+    _id: Types.ObjectId;
+    username: string;
+    fullname: string;
+    profilePicture: string;
+  };
+  blog: Types.ObjectId;
+};
+
 export type ErrorType = {
   message: string | string[];
 };

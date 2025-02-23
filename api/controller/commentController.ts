@@ -1,8 +1,11 @@
-import { Request, Response } from 'express';
-import type { CommentTypeSorted, ErrorType } from '../types/response';
 import Comment from '../models/comment';
 import Blog from '../models/blog';
-import { SortByQuery } from '../types/query_params';
+import User from '../models/user';
+import type { Request, Response } from 'express';
+import type { CommentTypeSorted, ErrorType } from '../types/response';
+import type { SortByQuery } from '../types/query_params';
+import type { CustomRequest } from '../types/request';
+import type { CreateCommentDto } from '../dtos';
 
 export const getComments = async (
   request: Request<{ blogId: string }, {}, {}, SortByQuery>,
@@ -77,8 +80,71 @@ export const getCommentById = async (
   }
 };
 
-export const createComment = async (request: Request, response: Response) => {
-  response.status(201).json({});
+export const createComment = async (
+  request: CustomRequest<{ blogId: string }, {}, CreateCommentDto>,
+  response: Response<CommentTypeSorted | ErrorType>,
+) => {
+  const userId = request.user?.id;
+  const { blogId } = request.params;
+  const { comment } = request.body;
+
+  if (!userId) {
+    response.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+  if (!comment) {
+    response.status(400).json({ message: 'Comment is required' });
+    return;
+  }
+
+  try {
+    const blog = await Blog.findById(blogId);
+    const user = await User.findById(userId);
+
+    if (!blog) {
+      response.status(404).json({ message: 'Blog not found' });
+      return;
+    }
+
+    if (!user) {
+      response.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    if (blog.author.toString() === userId) {
+      response
+        .status(400)
+        .json({ message: 'You cannot comment on your own blog' });
+      return;
+    }
+
+    const newComment = new Comment({
+      comment,
+      user: userId,
+      blog: blogId,
+    });
+
+    await newComment.save();
+
+    blog.comments.push(newComment.id);
+    await blog.save();
+
+    user.commentes.push(newComment.id);
+    await user.save();
+
+    const populatedComment = (await Comment.findById(newComment.id)
+      .populate('user', '_id username fullname profilePicture')
+      .lean()) as unknown as CommentTypeSorted;
+
+    response.status(201).json(populatedComment);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+    } else {
+      response.status(500).json({ message: 'An unknown error occurred' });
+    }
+  }
 };
 
 export const updateComment = async (request: Request, response: Response) => {

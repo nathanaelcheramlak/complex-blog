@@ -1,13 +1,12 @@
 import { body } from 'express-validator';
 
-export const validteRegister = [
+export const validateRegister = [
   // Validation
   body('fullname').notEmpty().withMessage('Fullname is required'),
   body('email').trim().isEmail().withMessage('Invalid email'),
   body('username').notEmpty().withMessage('Username is required'),
   body('password')
     .isLength({ min: 6 })
-    .isStrongPassword()
     .withMessage('Password must be 6 characters or more'),
   body('dateOfBirth').isDate().withMessage('Invalid date of birth'),
 ];
@@ -40,4 +39,15 @@ export const validateLogin = [
 
   // Validate password (must be provided)
   body('password').notEmpty().withMessage('Password is required'),
+];
+
+export const validateForgotPassword = [
+  body('email').isEmail().withMessage('Invalid email'),
+];
+
+export const validateResetPassword = [
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be 6 characters or more'),
+  body('token').notEmpty().withMessage('Token is required'),
 ];

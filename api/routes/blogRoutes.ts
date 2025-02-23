@@ -41,7 +41,7 @@ app.get('/:blogId/comments', getComments);
 
 app.get('/:blogId/comments/:id', getCommentById);
 
-app.post('/:blogId/comments', createComment);
+app.post('/:blogId/comments', authenticateJWT, createComment);
 
 app.put('/:blogId/comments/:id', updateComment);
 

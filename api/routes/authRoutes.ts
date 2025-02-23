@@ -9,17 +9,30 @@ import {
 } from '../controller/authController';
 import { authenticateJWT } from '../utils/verifyToken';
 import {
-  validteRegister,
+  validateRegister,
   validateLogin,
-} from '../middlewares/validateRegister';
+  validateForgotPassword,
+  validateResetPassword,
+} from '../middlewares/validateAuth';
+import { validateRequest } from '../middlewares/validateRequest';
 
 const app = express.Router();
 
-app.post('/login', validateLogin, login);
-app.post('/register', validteRegister, register);
+app.post('/login', validateLogin, validateRequest, login);
+app.post('/register', validateRegister, validateRequest, register);
 app.delete('/logout', logout);
-app.post('/forgot-password', forgotPassword);
-app.post('/reset-password', resetPassword);
+app.post(
+  '/forgot-password',
+  validateForgotPassword,
+  validateRequest,
+  forgotPassword,
+);
+app.post(
+  '/reset-password',
+  validateResetPassword,
+  validateRequest,
+  resetPassword,
+);
 app.get('/me', authenticateJWT, me);
 
 export default app;

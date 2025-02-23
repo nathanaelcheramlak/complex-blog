@@ -14,7 +14,7 @@ export type UserType = Document & {
   followers: Types.ObjectId[];
   following: Types.ObjectId[];
   liked_blogs: Types.ObjectId[];
-  commented_blogs: Types.ObjectId[];
+  commentes: Types.ObjectId[];
   bookmarked_blogs: Types.ObjectId[];
 };
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  getUser,
+  getUsers,
   getUserById,
   editUser,
   deleteUser,
@@ -17,12 +17,11 @@ import { authenticateJWT } from '../utils/verifyToken';
 import { validateObjectId } from '../middlewares/validateObjectId';
 import { validateRequest } from '../middlewares/validateRequest';
 import { validateEditProfile } from '../middlewares/validateUser';
-import { validateLogin } from '../middlewares/validateAuth';
 
 const app = express.Router();
 
 // User Routes
-app.get('/', authenticateJWT, getUser);
+app.get('/', authenticateJWT, getUsers);
 app.put('/', authenticateJWT, validateEditProfile, validateRequest, editUser);
 app.delete('/', authenticateJWT, deleteUser);
 app.get('/search', searchUser);
@@ -30,13 +29,13 @@ app.get('/search', searchUser);
 // Follow Routes
 app.get('/:id/followers', validateObjectId, getFollowers);
 app.get('/:id/following', validateObjectId, getFollowing);
-app.put('/follow/:id', validateObjectId, followUser);
-app.delete('/unfollow/:id', validateObjectId, unFollowUser);
+app.put('/follow/:id', authenticateJWT, validateObjectId, followUser);
+app.delete('/unfollow/:id', authenticateJWT, validateObjectId, unFollowUser);
 
 // Bookmark Routes
-app.get('/bookmark', getBookmarks);
-app.put('/bookmark/:blogId', addBookmark);
-app.delete('/bookmark/:blogId', deleteBookmark);
+app.get('/:id/bookmarks', getBookmarks);
+app.put('/bookmark/:blogId', authenticateJWT, addBookmark);
+app.delete('/bookmark/:blogId', authenticateJWT, deleteBookmark);
 
 app.get('/:id', validateObjectId, validateRequest, getUserById);
 

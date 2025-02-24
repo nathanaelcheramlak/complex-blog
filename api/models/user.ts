@@ -69,7 +69,7 @@ const userSchema: Schema = new Schema(
         ref: 'Comment',
       },
     ],
-    bookmarked_blogs: [
+    bookmarks: [
       {
         type: Schema.Types.ObjectId,
         ref: 'Bookmark',

@@ -125,7 +125,23 @@ export const getFollowers = async (
       return;
     }
 
-    res.status(200).json({ followers: user.followers.map(mapUser) });
+    const { sortBy, order } = req.query;
+    let followers = [];
+    if (sortBy === 'date') {
+      followers = await User.find({ _id: { $in: user.followers } })
+        .sort({ createdAt: order === 'des' ? -1 : 1 })
+        .lean();
+    } else if (sortBy === 'fullname') {
+      followers = await User.find({ _id: { $in: user.followers } })
+        .sort({ fullname: order === 'des' ? -1 : 1 })
+        .lean();
+    } else {
+      followers = await User.find({
+        _id: { $in: user.followers },
+      }).lean();
+    }
+
+    res.status(200).json({ followers: followers.map(mapUser) });
   } catch (error) {
     console.log('Error on get followers controller: ', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -143,7 +159,21 @@ export const getFollowing = async (
     return;
   }
 
-  res.status(200).json({ following: user.following.map(mapUser) });
+  const { sortBy, order } = req.query;
+  let following = [];
+  if (sortBy === 'date') {
+    following = await User.find({ _id: { $in: user.following } })
+      .sort({ createdAt: order === 'des' ? -1 : 1 })
+      .lean();
+  } else if (sortBy == 'fullname') {
+    following = await User.find({ _id: { $in: user.following } })
+      .sort({ fullname: order === 'des' ? -1 : 1 })
+      .lean();
+  } else {
+    following = await User.find({ _id: { $in: user.following } }).lean();
+  }
+
+  res.status(200).json({ following: following.map(mapUser) });
 };
 
 export const followUser = async (
@@ -238,7 +268,25 @@ export const getBookmarks = async (
       return;
     }
 
-    res.status(200).json({ bookmarks: user.bookmarks });
+    const { sortBy, order } = req.query;
+    let bookmarks = [];
+    if (sortBy === 'date') {
+      bookmarks = await Blog.find({ _id: { $in: user.bookmarks } })
+        .sort({ createdAt: order === 'des' ? -1 : 1 })
+        .lean();
+    } else if (sortBy === 'likes') {
+      bookmarks = await Blog.find({ _id: { $in: user.bookmarks } })
+        .sort({ likes: order === 'des' ? -1 : 1 })
+        .lean();
+    } else if (sortBy === 'title') {
+      bookmarks = await Blog.find({ _id: { $in: user.bookmarks } })
+        .sort({ title: order === 'des' ? -1 : 1 })
+        .lean();
+    } else {
+      bookmarks = await Blog.find({ _id: { $in: user.bookmarks } }).lean();
+    }
+
+    res.status(200).json({ bookmarks: bookmarks });
   } catch (error) {
     console.log('Error on get bookmarks controller: ', error);
     res.status(500).json({ message: 'Internal server error' });

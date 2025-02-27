@@ -6,6 +6,7 @@ import {
   logout,
   me,
   resetPassword,
+  verifyEmail,
 } from '../controller/authController';
 import { authenticateJWT } from '../utils/verifyToken';
 import {
@@ -33,6 +34,7 @@ app.post(
   validateRequest,
   resetPassword,
 );
+app.get('/verify-email', verifyEmail);
 app.get('/me', authenticateJWT, me);
 
 export default app;

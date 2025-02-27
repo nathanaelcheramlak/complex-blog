@@ -1,4 +1,5 @@
 import { CallbackError, Schema, model } from 'mongoose';
+import crypto from 'crypto';
 import type { UserType } from '../types/model';
 import Blog from './blog';
 import Comment from './comment';
@@ -39,6 +40,8 @@ const userSchema: Schema = new Schema(
     },
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String, default: null },
     blogs: [
       {
         type: Schema.Types.ObjectId,
@@ -123,6 +126,12 @@ userSchema.pre('findOneAndDelete', async function (next: any) {
     session.endSession();
   }
 });
+
+userSchema.methods.generateEmailVerificationToken = function () {
+  const token = crypto.randomBytes(32).toString('hex');
+  this.emailVerificationToken = token;
+  return token;
+};
 
 const User = model<UserType>('User', userSchema);
 export default User;

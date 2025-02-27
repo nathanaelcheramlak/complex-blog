@@ -10,12 +10,16 @@ export type UserType = Document & {
   profilePicture: string;
   resetPasswordToken?: string | null;
   resetPasswordExpires?: Date | null;
+  emailVerified: Boolean;
+  emailVerificationToken: String | null;
   blogs: Types.ObjectId[];
   followers: Types.ObjectId[];
   following: Types.ObjectId[];
   liked_blogs: Types.ObjectId[];
   commentes: Types.ObjectId[];
   bookmarks: Types.ObjectId[];
+
+  generateEmailVerificationToken: () => string;
 };
 
 export type BlogType = Document & {

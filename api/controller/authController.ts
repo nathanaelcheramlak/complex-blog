@@ -24,6 +24,11 @@ export const login: RequestHandler = async (
       return;
     }
 
+    if (!user.emailVerified) {
+      res.status(400).json({ message: 'Please verify your email' });
+      return;
+    }
+
     // Check if the password is correct
     const isMatch = await compare(password, user.password);
     if (!isMatch) {
@@ -79,13 +84,49 @@ export const register: RequestHandler = async (
       dateOfBirth,
     });
 
+    const token = newUser.generateEmailVerificationToken();
     await newUser.save();
-    setAuthCookie(res, { id: newUser.id, username: newUser.username });
 
-    res.json(mapUser(newUser));
+    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    await sendEmail(
+      newUser.email,
+      'Email Verification',
+      `Click here to verify your email: ${verificationLink}`,
+    );
+    // setAuthCookie(res, { id: newUser.id, username: newUser.username });
+
+    // res.json(mapUser(newUser));
+    res.json({
+      message: 'User registered successfully. Please verify your email',
+    });
     return;
   } catch (error) {
     console.log('Error in register controller: ', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const verifyEmail: RequestHandler = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { token } = req.query;
+    const user = await User.findOne({ emailVerificationToken: token });
+    if (!user) {
+      res.status(400).json({ message: 'Invalid or expired token' });
+      return;
+    }
+
+    // Verify email
+    user.emailVerified = true;
+    user.emailVerificationToken = null; // Remove token after verification
+    await user.save();
+
+    res.json({ message: 'Email verified successfully! You can now log in.' });
+    return;
+  } catch (error) {
+    console.log('Error in verify email controller: ', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

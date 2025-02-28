@@ -87,6 +87,57 @@ export const createLike = async (
   }
 };
 
-export const deleteLike = async (request: Request, response: Response) => {
-  response.status(200).json({});
+export const deleteLike = async (
+  request: CustomRequest<{ blogId: string; id: string }, {}, {}>,
+  response: Response<ErrorType>
+) => {
+  const userId = request.user?.id;
+  const { blogId, id } = request.params;
+
+  try {
+    const blog = await Blog.findById(blogId);
+    const user = await User.findById(userId);
+
+    if (!blog) {
+      response.status(404).json({ message: 'Blog not found' });
+      return;
+    }
+
+    if (!user) {
+      response.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    if (!blog.likes.includes(user.id)) {
+      response.status(400).json({ message: 'You have not liked this blog' });
+      return;
+    }
+
+    const like = await Like.findById(id);
+
+    if (!like) {
+      response.status(404).json({ message: 'Like not found' });
+      return;
+    }
+
+    blog.likes = blog.likes.filter((like) => like.toString() !== user.id);
+    user.liked_blogs = user.liked_blogs.filter(
+      (likedBlog) => likedBlog.toString() !== blog.id
+    );
+
+    await blog.save();
+    await user.save();
+
+    await like.deleteOne();
+
+    response.status(204);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+      return;
+    } else {
+      response.status(500).json({ message: 'Something went wrong' });
+      return;
+    }
+  }
 };

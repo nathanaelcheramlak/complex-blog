@@ -193,6 +193,58 @@ export const updateComment = async (
   }
 };
 
-export const deleteComment = async (request: Request, response: Response) => {
-  response.status(200).json({});
+export const deleteComment = async (
+  request: CustomRequest<{ blogId: string; id: string }, {}, {}>,
+  response: Response<{ message: string } | ErrorType>
+) => {
+  const userId = request.user?.id;
+  const { blogId, id } = request.params;
+
+  if (!userId) {
+    response.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const blog = await Blog.findById(blogId);
+    const user = await User.findById(userId);
+    const existingComment = await Comment.findById(id);
+
+    if (!blog) {
+      response.status(404).json({ message: 'Blog not found' });
+      return;
+    }
+
+    if (!user) {
+      response.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    if (!existingComment) {
+      response.status(404).json({ message: 'Comment not found' });
+      return;
+    }
+
+    blog.comments = blog.comments.filter(
+      (comment) => comment.toString() !== id
+    );
+    await blog.save();
+
+    user.commentes = user.commentes.filter(
+      (comment) => comment.toString() !== id
+    );
+    await user.save();
+
+    await existingComment.deleteOne();
+
+    response.status(204);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+      return;
+    } else {
+      response.status(500).json({ message: 'An unknown error occurred' });
+      return;
+    }
+  }
 };

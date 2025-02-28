@@ -32,9 +32,9 @@ app.delete('/:id', authenticateJWT, deleteBlog);
 
 app.get('/:blogId/likes', getLikes);
 
-app.post('/:blogId/likes', createLike);
+app.post('/:blogId/likes', authenticateJWT, createLike);
 
-app.delete('/:blogId/likes/:id', deleteLike);
+app.delete('/:blogId/likes/:id', authenticateJWT, deleteLike);
 
 // comments
 app.get('/:blogId/comments', getComments);

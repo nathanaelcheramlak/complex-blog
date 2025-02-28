@@ -5,11 +5,11 @@ import type { Request, Response } from 'express';
 import type { CommentTypeSorted, ErrorType } from '../types/response';
 import type { SortByQuery } from '../types/query_params';
 import type { CustomRequest } from '../types/request';
-import type { CreateCommentDto } from '../dtos';
+import type { CreateCommentDto, UpdateCommentDto } from '../dtos';
 
 export const getComments = async (
   request: Request<{ blogId: string }, {}, {}, SortByQuery>,
-  response: Response<CommentTypeSorted[] | ErrorType>,
+  response: Response<CommentTypeSorted[] | ErrorType>
 ) => {
   const { blogId } = request.params;
   const { sortBy, order } = request.query;
@@ -49,7 +49,7 @@ export const getComments = async (
 
 export const getCommentById = async (
   request: Request<{ blogId: string; id: string }>,
-  response: Response<CommentTypeSorted | ErrorType>,
+  response: Response<CommentTypeSorted | ErrorType>
 ) => {
   const { blogId, id } = request.params;
 
@@ -82,7 +82,7 @@ export const getCommentById = async (
 
 export const createComment = async (
   request: CustomRequest<{ blogId: string }, {}, CreateCommentDto>,
-  response: Response<CommentTypeSorted | ErrorType>,
+  response: Response<CommentTypeSorted | ErrorType>
 ) => {
   const userId = request.user?.id;
   const { blogId } = request.params;
@@ -147,8 +147,50 @@ export const createComment = async (
   }
 };
 
-export const updateComment = async (request: Request, response: Response) => {
-  response.status(200).json({});
+export const updateComment = async (
+  request: CustomRequest<{ blogId: string; id: string }, {}, UpdateCommentDto>,
+  response: Response<CommentTypeSorted | ErrorType>
+) => {
+  const { blogId, id } = request.params;
+  const { comment } = request.body;
+
+  if (!comment) {
+    response.status(400).json({ message: 'Comment is required' });
+    return;
+  }
+
+  try {
+    const blog = await Blog.findById(blogId);
+    const existingComment = await Comment.findById(id);
+
+    if (!blog) {
+      response.status(404).json({ message: 'Blog not found' });
+      return;
+    }
+
+    if (!existingComment) {
+      response.status(404).json({ message: 'Comment not found' });
+      return;
+    }
+
+    existingComment.comment = comment;
+
+    await existingComment.save();
+
+    const updatedComment = (await Comment.findById(id)
+      .populate('user', '_id username fullname profilePicture')
+      .lean()) as unknown as CommentTypeSorted;
+
+    response.status(200).json(updatedComment);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+      return;
+    } else {
+      response.status(500).json({ message: 'An unknown error occurred' });
+      return;
+    }
+  }
 };
 
 export const deleteComment = async (request: Request, response: Response) => {

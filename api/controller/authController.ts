@@ -103,7 +103,7 @@ export const register: RequestHandler = async (
     const token = newUser.generateEmailVerificationToken();
     await newUser.save();
 
-    const verificationLink = `${process.env.BACKEND_URL}/auth/verify-email?token=${token}`;
+    const verificationLink = `${process.env.BACKEND_URL}/api/auth/verify-email?token=${token}`;
     await sendEmail(
       newUser.email,
       'Email Verification',
@@ -170,7 +170,7 @@ export const forgotPassword: RequestHandler = async (
     await user.save();
 
     // Send email with the reset token
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.BACKEND_URL}/api/auth/reset-password?token=${resetToken}`;
     await sendEmail(user.email, 'Reset Password', 'passwordReset', resetLink);
 
     res.json({ message: 'Reset link sent to your email', error: false });

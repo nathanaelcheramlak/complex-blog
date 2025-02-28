@@ -98,7 +98,7 @@ export const generateEmailTemplate = (
 <body>
   <div class="email-container">
     <div class="email-content">
-      <img src="https://your-logo-url.com/logo.png" alt="Company Logo" class="logo" width="100">
+      <img src="https://github.com/nathanaelcheramlak/complex-blog/blob/main/public/ComplexLogo.png" alt="Company Logo" class="logo" width="100">
       <h2 class="title">${title}</h2>
       <p class="message">${message}</p>
       <a href="${buttonLink}" class="btn">${buttonContent}</a>

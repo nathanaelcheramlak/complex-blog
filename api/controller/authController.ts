@@ -64,10 +64,26 @@ export const register: RequestHandler = async (
     const { fullname, email, username, password, dateOfBirth } =
       matchedData(req);
 
-    // Check if the user exists
-    const user = await User.findOne({ $or: [{ email }, { username }] });
-    if (user) {
-      res.status(400).json({ message: 'User already exists' });
+    // Check if the email is already taken
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      if (existingEmail.emailVerified) {
+        res.status(400).json({
+          message: 'Email is already registered. Login with your credentials.',
+        });
+        return;
+      } else {
+        res
+          .status(400)
+          .json({ message: 'Already registered. Please verify your email' });
+        return;
+      }
+    }
+
+    // Check if the username is already taken
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      res.status(400).json({ message: 'Username is already taken' });
       return;
     }
 
@@ -87,15 +103,14 @@ export const register: RequestHandler = async (
     const token = newUser.generateEmailVerificationToken();
     await newUser.save();
 
-    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    const verificationLink = `${process.env.BACKEND_URL}/auth/verify-email?token=${token}`;
     await sendEmail(
       newUser.email,
       'Email Verification',
-      `Click here to verify your email: ${verificationLink}`,
+      'verifyEmail',
+      verificationLink,
     );
-    // setAuthCookie(res, { id: newUser.id, username: newUser.username });
 
-    // res.json(mapUser(newUser));
     res.json({
       message: 'User registered successfully. Please verify your email',
     });
@@ -156,11 +171,7 @@ export const forgotPassword: RequestHandler = async (
 
     // Send email with the reset token
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    await sendEmail(
-      user.email,
-      'Reset Password',
-      `Click here to reset your password: ${resetLink}`,
-    );
+    await sendEmail(user.email, 'Reset Password', 'passwordReset', resetLink);
 
     res.json({ message: 'Reset link sent to your email', error: false });
   } catch (error) {

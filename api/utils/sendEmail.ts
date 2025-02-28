@@ -1,10 +1,13 @@
-import { ExpressValidator } from 'express-validator';
 import nodemailer from 'nodemailer';
+import { generateEmailTemplate } from './emailTemplate';
+
+type EmailType = 'passwordReset' | 'welcome' | 'verifyEmail';
 
 const sendEmail = async (
   to: string,
   subject: string,
-  text: string,
+  emailType: EmailType,
+  buttonLink: string,
 ): Promise<void> => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -14,11 +17,15 @@ const sendEmail = async (
     },
   });
 
+  const htmlContent = generateEmailTemplate(emailType, buttonLink);
+  const text = `${subject}\nClick the link below\n${buttonLink}`;
+
   await transporter.sendMail({
     from: process.env.EMAIL,
     to,
     subject,
-    text,
+    text, // Fallback text
+    html: htmlContent,
   });
 };
 

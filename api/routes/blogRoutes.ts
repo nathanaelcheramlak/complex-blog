@@ -43,8 +43,8 @@ app.get('/:blogId/comments/:id', getCommentById);
 
 app.post('/:blogId/comments', authenticateJWT, createComment);
 
-app.put('/:blogId/comments/:id', updateComment);
+app.put('/:blogId/comments/:id', authenticateJWT, updateComment);
 
-app.delete('/:blogId/comments/:id', deleteComment);
+app.delete('/:blogId/comments/:id', authenticateJWT, deleteComment);
 
 export default app;

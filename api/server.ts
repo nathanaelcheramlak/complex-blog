@@ -47,14 +47,11 @@ app.use('/api-docs', cors(), swaggerUi.serve, swaggerUi.setup(specs));
  *       200:
  *         description: Returns a welcome message.
  */
-app.get('/', (req, res) => {
-  res.send('Welcome to the API');
-});
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/blogs', blogRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/blogs', blogRoutes);
 
 // Start the Server
 app.listen(PORT, () => {

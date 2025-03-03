@@ -16,7 +16,7 @@ export type UserType = Document & {
   followers: Types.ObjectId[];
   following: Types.ObjectId[];
   liked_blogs: Types.ObjectId[];
-  commentes: Types.ObjectId[];
+  comments: Types.ObjectId[];
   bookmarks: Types.ObjectId[];
 
   generateEmailVerificationToken: () => string;

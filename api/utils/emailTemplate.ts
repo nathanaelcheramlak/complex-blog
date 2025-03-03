@@ -1,4 +1,4 @@
-type EmailType = 'passwordReset' | 'welcome' | 'verifyEmail';
+import { EmailType } from '../types/email';
 
 const emailTypes: Record<
   EmailType,

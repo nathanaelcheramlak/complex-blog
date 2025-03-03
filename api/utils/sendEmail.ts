@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer';
 import { generateEmailTemplate } from './emailTemplate';
-
-type EmailType = 'passwordReset' | 'welcome' | 'verifyEmail';
+import { EmailType } from '../types/email';
 
 const sendEmail = async (
   to: string,

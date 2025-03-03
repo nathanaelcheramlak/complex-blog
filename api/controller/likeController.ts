@@ -7,7 +7,7 @@ import Like from '../models/like';
 
 export const getLikes = async (
   request: Request<{ blogId: string }>,
-  response: Response<{ likes: number } | ErrorType>
+  response: Response<{ likes: number } | ErrorType>,
 ) => {
   const { blogId } = request.params;
 
@@ -35,7 +35,7 @@ export const getLikes = async (
 
 export const createLike = async (
   request: CustomRequest<{ blogId: string }, {}, {}>,
-  response: Response<LikeTypeSorted | ErrorType>
+  response: Response<LikeTypeSorted | ErrorType>,
 ) => {
   const userId = request.user?.id;
   const { blogId } = request.params;
@@ -72,7 +72,7 @@ export const createLike = async (
 
     const likePopulated = (await Like.findById(like.id).populate(
       'user',
-      'id username fullname profilePicture'
+      'id username fullname profilePicture',
     )) as unknown as LikeTypeSorted;
 
     response.status(201).json(likePopulated);
@@ -89,7 +89,7 @@ export const createLike = async (
 
 export const deleteLike = async (
   request: CustomRequest<{ blogId: string; id: string }, {}, {}>,
-  response: Response<ErrorType>
+  response: Response<ErrorType>,
 ) => {
   const userId = request.user?.id;
   const { blogId, id } = request.params;
@@ -122,13 +122,13 @@ export const deleteLike = async (
 
     blog.likes = blog.likes.filter((like) => like.toString() !== user.id);
     user.liked_blogs = user.liked_blogs.filter(
-      (likedBlog) => likedBlog.toString() !== blog.id
+      (likedBlog) => likedBlog.toString() !== blog.id,
     );
 
     await blog.save();
     await user.save();
 
-    await like.deleteOne();
+    await like.deleteOne({ _id: id });
 
     response.status(204);
   } catch (error: unknown) {

@@ -4,7 +4,7 @@ import User from '../models/user';
 import { setAuthCookie, clearAuthToken } from '../utils/authCookies';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail';
-import { AuthenticatedRequest } from '../types/request';
+import { CustomRequest } from '../types/request';
 import { ErrorType } from '../types/response';
 import { matchedData } from 'express-validator';
 import { mapUser, UserProfileDto } from '../dtos/user.dto';
@@ -236,7 +236,7 @@ export const logout: RequestHandler = async (
 };
 
 export const me: RequestHandler = async (
-  req: AuthenticatedRequest,
+  req: CustomRequest<{}, {}, {}>,
   res: Response<UserProfileDto | ErrorType>,
 ): Promise<void> => {
   try {

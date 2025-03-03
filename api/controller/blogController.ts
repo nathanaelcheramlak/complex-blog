@@ -13,7 +13,7 @@ import User from '../models/user';
 
 export const getBlogs = async (
   request: Request<{}, {}, {}, SortByQuery>,
-  response: Response<BlogTypeSorted[] | ErrorType>
+  response: Response<BlogTypeSorted[] | ErrorType>,
 ) => {
   try {
     const { sortBy, order } = request.query;
@@ -48,7 +48,7 @@ export const getBlogs = async (
 
 export const getBlogById = async (
   request: Request,
-  response: Response<PopulatedBlogType | ErrorType>
+  response: Response<PopulatedBlogType | ErrorType>,
 ) => {
   const { id } = request.params;
   try {
@@ -74,7 +74,7 @@ export const getBlogById = async (
 
 export const createBlog = async (
   request: CustomRequest<{}, {}, CreateBlogDto>,
-  response: Response<BlogType | ErrorType>
+  response: Response<BlogType | ErrorType>,
 ) => {
   const userId = request.user?.id;
   const { title, content } = request.body;
@@ -120,7 +120,7 @@ export const createBlog = async (
 
 export const updateBlog = async (
   request: CustomRequest<{ id: string }, {}, UpdateBlogDto>,
-  response: Response<BlogType | ErrorType>
+  response: Response<BlogType | ErrorType>,
 ) => {
   const userId = request.user?.id;
   const { id } = request.params;
@@ -171,7 +171,7 @@ export const updateBlog = async (
 
 export const deleteBlog = async (
   request: CustomRequest<{ id: string }, {}, {}>,
-  response: Response<{ message: string } | ErrorType>
+  response: Response<{ message: string } | ErrorType>,
 ) => {
   const userId = request.user?.id;
   const { id } = request.params;
@@ -200,7 +200,7 @@ export const deleteBlog = async (
       await user.save();
     }
 
-    await blog.deleteOne();
+    await blog.deleteOne({ _id: id });
 
     response.status(204);
   } catch (error: unknown) {

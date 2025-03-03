@@ -9,7 +9,7 @@ import type { CreateCommentDto, UpdateCommentDto } from '../dtos';
 
 export const getComments = async (
   request: Request<{ blogId: string }, {}, {}, SortByQuery>,
-  response: Response<CommentTypeSorted[] | ErrorType>
+  response: Response<CommentTypeSorted[] | ErrorType>,
 ) => {
   const { blogId } = request.params;
   const { sortBy, order } = request.query;
@@ -49,7 +49,7 @@ export const getComments = async (
 
 export const getCommentById = async (
   request: Request<{ blogId: string; id: string }>,
-  response: Response<CommentTypeSorted | ErrorType>
+  response: Response<CommentTypeSorted | ErrorType>,
 ) => {
   const { blogId, id } = request.params;
 
@@ -82,7 +82,7 @@ export const getCommentById = async (
 
 export const createComment = async (
   request: CustomRequest<{ blogId: string }, {}, CreateCommentDto>,
-  response: Response<CommentTypeSorted | ErrorType>
+  response: Response<CommentTypeSorted | ErrorType>,
 ) => {
   const userId = request.user?.id;
   const { blogId } = request.params;
@@ -130,7 +130,7 @@ export const createComment = async (
     blog.comments.push(newComment.id);
     await blog.save();
 
-    user.commentes.push(newComment.id);
+    user.comments.push(newComment.id);
     await user.save();
 
     const populatedComment = (await Comment.findById(newComment.id)
@@ -149,7 +149,7 @@ export const createComment = async (
 
 export const updateComment = async (
   request: CustomRequest<{ blogId: string; id: string }, {}, UpdateCommentDto>,
-  response: Response<CommentTypeSorted | ErrorType>
+  response: Response<CommentTypeSorted | ErrorType>,
 ) => {
   const { blogId, id } = request.params;
   const { comment } = request.body;
@@ -195,7 +195,7 @@ export const updateComment = async (
 
 export const deleteComment = async (
   request: CustomRequest<{ blogId: string; id: string }, {}, {}>,
-  response: Response<{ message: string } | ErrorType>
+  response: Response<{ message: string } | ErrorType>,
 ) => {
   const userId = request.user?.id;
   const { blogId, id } = request.params;
@@ -226,16 +226,16 @@ export const deleteComment = async (
     }
 
     blog.comments = blog.comments.filter(
-      (comment) => comment.toString() !== id
+      (comment) => comment.toString() !== id,
     );
     await blog.save();
 
-    user.commentes = user.commentes.filter(
-      (comment) => comment.toString() !== id
+    user.comments = user.comments.filter(
+      (comment) => comment.toString() !== id,
     );
     await user.save();
 
-    await existingComment.deleteOne();
+    await existingComment.deleteOne({ _id: id });
 
     response.status(204);
   } catch (error: unknown) {

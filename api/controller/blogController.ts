@@ -10,6 +10,7 @@ import type { CreateBlogDto, UpdateBlogDto } from '../dtos';
 import { SortByQuery } from '../types/query_params';
 import { CustomRequest } from '../types/request';
 import User from '../models/user';
+import mongoose from 'mongoose';
 
 export const getBlogs = async (
   request: Request<{}, {}, {}, SortByQuery>,
@@ -35,6 +36,53 @@ export const getBlogs = async (
         .populate('author', '_id username fullname profilePicture')
         .lean()) as unknown as BlogTypeSorted[];
     }
+
+    response.status(200).json(blogs);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+    } else {
+      response.status(500).json({ message: 'An unknown error occurred.' });
+    }
+  }
+};
+
+export const getMyBlogs = async (
+  request: CustomRequest<{}, {}, {}>,
+  response: Response,
+) => {
+  const userId = new mongoose.Types.ObjectId(request.user?.id);
+
+  if (!userId) {
+    response.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const blogs = (await Blog.find({ author: userId })
+      .populate('author', '_id username fullname profilePicture')
+      .lean()) as unknown as BlogTypeSorted[];
+
+    response.status(200).json(blogs);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      response.status(500).json({ message: error.message });
+    } else {
+      response.status(500).json({ message: 'An unknown error occurred.' });
+    }
+  }
+};
+
+export const getUserBlogs = async (
+  request: Request<{ userId: string }, {}, {}, {}>,
+  response: Response<BlogTypeSorted[] | ErrorType>,
+) => {
+  const { userId } = request.params;
+
+  try {
+    const blogs = (await Blog.find({ author: userId })
+      .populate('author', '_id username fullname profilePicture')
+      .lean()) as unknown as BlogTypeSorted[];
 
     response.status(200).json(blogs);
   } catch (error: unknown) {

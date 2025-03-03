@@ -4,6 +4,8 @@ import {
   deleteBlog,
   getBlogById,
   getBlogs,
+  getMyBlogs,
+  getUserBlogs,
   updateBlog,
 } from '../controller/blogController';
 import { createLike, deleteLike, getLikes } from '../controller/likeController';
@@ -21,6 +23,10 @@ const app = express.Router();
 app.get('/', getBlogs);
 
 app.get('/:id', getBlogById);
+
+app.get('/user/:userId', getUserBlogs);
+
+app.get('/myblogs', authenticateJWT, getMyBlogs);
 
 app.post('/', authenticateJWT, createBlog);
 

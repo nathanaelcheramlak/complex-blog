@@ -5,13 +5,14 @@ import User from '../models/user';
 import Blog from '../models/blog';
 import { CustomRequest } from '../types/request';
 import { mapUser } from '../dtos/user.dto';
+import Bookmark from '../models/bookmark';
 
 export const getUsers = async (
   req: CustomRequest<{}, {}, {}>,
   res: Response,
 ) => {
   try {
-    const users = await User.find().lean();
+    const users = await User.find().limit(20).lean();
 
     res.status(200).json({ users: users.map(mapUser) });
   } catch (error) {
@@ -119,7 +120,7 @@ export const getFollowers = async (
 ): Promise<void> => {
   try {
     const userId = req.params.id;
-    const user = await User.findById(userId).populate('followers').lean();
+    const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ message: 'User not found' });
       return;
@@ -129,7 +130,7 @@ export const getFollowers = async (
     let followers = [];
     if (sortBy === 'date') {
       followers = await User.find({ _id: { $in: user.followers } })
-        .sort({ createdAt: order === 'des' ? -1 : 1 })
+        .sort({ createdAt: order === 'asc' ? 1 : -1 })
         .lean();
     } else if (sortBy === 'fullname') {
       followers = await User.find({ _id: { $in: user.followers } })
@@ -153,7 +154,7 @@ export const getFollowing = async (
   res: Response,
 ): Promise<void> => {
   const userId = req.params.id;
-  const user = await User.findById(userId).populate('following').lean();
+  const user = await User.findById(userId);
   if (!user) {
     res.status(404).json({ message: 'User not found' });
     return;
@@ -163,7 +164,7 @@ export const getFollowing = async (
   let following = [];
   if (sortBy === 'date') {
     following = await User.find({ _id: { $in: user.following } })
-      .sort({ createdAt: order === 'des' ? -1 : 1 })
+      .sort({ createdAt: order === 'asc' ? 1 : -1 })
       .lean();
   } else if (sortBy == 'fullname') {
     following = await User.find({ _id: { $in: user.following } })
@@ -317,6 +318,11 @@ export const addBookmark = async (
       res.status(400).json({ message: 'Blog already bookmarked' });
       return;
     }
+    const bookmark = new Bookmark({
+      user: userId,
+      blog: blogId,
+    });
+    bookmark.save();
 
     user.bookmarks.push(blogId);
     await user.save();
@@ -353,6 +359,7 @@ export const deleteBookmark = async (
       return;
     }
 
+    const bookmark = await Bookmark.deleteOne({ user: userId, blog: blogId });
     user.bookmarks = user.bookmarks.filter(
       (bookmarkId) => !bookmarkId.equals(blogId),
     );

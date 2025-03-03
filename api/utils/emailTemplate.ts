@@ -65,7 +65,7 @@ export const generateEmailTemplate = (
       box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     }
     .logo {
-      margin-bottom: 20px;
+      margin-bottom: 1.25rem;
     }
     .title {
       font-size: 22px;
@@ -98,7 +98,12 @@ export const generateEmailTemplate = (
 <body>
   <div class="email-container">
     <div class="email-content">
-      <img src="https://github.com/nathanaelcheramlak/complex-blog/blob/main/public/ComplexLogo.png" alt="Company Logo" class="logo" width="100">
+      <img
+          src="https://raw.githubusercontent.com/nathanaelcheramlak/complex-blog/refs/heads/main/public/ComplexLogoBlack.png"
+          alt="Company Logo"
+          class="logo"
+          width="70%"
+        />
       <h2 class="title">${title}</h2>
       <p class="message">${message}</p>
       <a href="${buttonLink}" class="btn">${buttonContent}</a>

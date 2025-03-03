@@ -8,7 +8,6 @@ import swaggerDocument from './swagger.json';
 
 import connectDB from './config/db';
 import { authRoutes, userRoutes, blogRoutes } from './routes/routes';
-import { authenticateJWT } from './utils/verifyToken';
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;

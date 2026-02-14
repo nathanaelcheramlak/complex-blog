@@ -30,3 +30,6 @@ api/coverage/
 
 # Ignore macOS specific files
 .DS_Store
+
+# Ignore turbo cache
+.turbo

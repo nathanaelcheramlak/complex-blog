@@ -33,3 +33,6 @@ api/coverage/
 
 # Ignore turbo cache
 .turbo
+
+# Ignore sqlite db
+*.sqlite

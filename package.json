@@ -10,7 +10,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.27.0",
+  "packageManager": "pnpm@10.29.3",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sqlite3",
+      "@nestjs/core",
+      "sharp"
+    ]
+  },
   "devDependencies": {
     "turbo": "^2.8.8"
   }

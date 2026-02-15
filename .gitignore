@@ -36,3 +36,4 @@ api/coverage/
 
 # Ignore sqlite db
 *.sqlite
+*.db

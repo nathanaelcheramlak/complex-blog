@@ -3,7 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './user/user.module';
+import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
+import { TagModule } from './tag/tag.module';
 import { join } from 'node:path';
+import { LikeModule } from './like/like.module';
 
 @Module({
   imports: [
@@ -30,6 +35,11 @@ import { join } from 'node:path';
         };
       },
     }),
+    UserModule,
+    PostModule,
+    CommentModule,
+    TagModule,
+    LikeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

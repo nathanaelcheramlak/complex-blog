@@ -9,6 +9,7 @@ import { CommentModule } from './comment/comment.module';
 import { TagModule } from './tag/tag.module';
 import { join } from 'node:path';
 import { LikeModule } from './like/like.module';
+import { DatabaseModule } from './database/seeder.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { LikeModule } from './like/like.module';
     CommentModule,
     TagModule,
     LikeModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

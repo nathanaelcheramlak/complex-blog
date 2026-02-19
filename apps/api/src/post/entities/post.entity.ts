@@ -48,7 +48,7 @@ export class PostEntity {
   @ManyToMany(() => TagEntity, (tag: TagEntity) => tag.posts, {
     onDelete: 'RESTRICT',
   })
-  tags!: TagEntity;
+  tags!: TagEntity[];
 
   @OneToMany(() => CommentEntity, (comment: CommentEntity) => comment.post)
   comments!: CommentEntity[];

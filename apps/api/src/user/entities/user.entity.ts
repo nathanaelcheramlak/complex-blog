@@ -5,6 +5,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  // Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -15,9 +16,15 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  // indexing for performance gain (SQLite not supported)
+  // @Column({ collation: 'NOCASE' })
+  // @Index()
   @Column()
   name!: string;
 
+  // indexing for performance gain (SQLite not supported)
+  // @Column({ unique: true, collation: 'NOCASE' })
+  // @Index()
   @Column()
   email!: string;
 

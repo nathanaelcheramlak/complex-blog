@@ -10,6 +10,7 @@ import { TagModule } from './tag/tag.module';
 import { join } from 'node:path';
 import { LikeModule } from './like/like.module';
 import { DatabaseModule } from './database/seeder.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { DatabaseModule } from './database/seeder.module';
     TagModule,
     LikeModule,
     DatabaseModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

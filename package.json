@@ -13,9 +13,13 @@
   "packageManager": "pnpm@10.29.3",
   "pnpm": {
     "onlyBuiltDependencies": [
-      "sqlite3",
       "@nestjs/core",
-      "sharp"
+      "bcrypt",
+      "sharp",
+      "sqlite3"
+    ],
+    "ignoredBuiltDependencies": [
+      "@scarf/scarf"
     ]
   },
   "devDependencies": {

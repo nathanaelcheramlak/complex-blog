@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from 'src/auth/dtos/login.dto';
-import { AuthTokenResponse } from 'src/auth/models/api-token-response.interface.ts';
+import { AuthTokenResponse } from 'src/auth/models/auth-token-response.model';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 

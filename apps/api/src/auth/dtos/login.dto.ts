@@ -8,11 +8,11 @@ export class LoginDto {
   })
   @IsString()
   @MaxLength(160)
-  identifier!: string;
+  readonly identifier!: string;
 
   @ApiProperty({ example: 'ChangeMe123!' })
   @IsString()
-  @MinLength(4)
+  @MinLength(8)
   @MaxLength(72)
-  password!: string;
+  readonly password!: string;
 }

@@ -13,18 +13,28 @@ export class RegisterDto {
   @MaxLength(120)
   readonly name!: string;
 
-  @ApiProperty({ example: 'john@example.com', description: 'User email address' })
+  @ApiProperty({
+    example: 'john@example.com',
+    description: 'User email address',
+  })
   @IsEmail()
   @MaxLength(120)
   readonly email!: string;
 
-  @ApiProperty({ example: 'password123', description: 'Password (8-72 characters)' })
+  @ApiProperty({
+    example: 'password123',
+    description: 'Password (8-72 characters)',
+  })
   @IsString()
   @MinLength(8)
   @MaxLength(72)
   readonly password!: string;
 
-  @ApiProperty({ example: 'https://example.com/avatar.jpg', description: 'Optional avatar URL', required: false })
+  @ApiProperty({
+    example: 'https://example.com/avatar.jpg',
+    description: 'Optional avatar URL',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   readonly avatar?: string;

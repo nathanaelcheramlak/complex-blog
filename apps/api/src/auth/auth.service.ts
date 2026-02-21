@@ -68,6 +68,16 @@ export class AuthService {
     return this.createTokenResponse(user);
   }
 
+  async getProfile(userId: number): Promise<AuthTokenResponse['user']> {
+    const user: UserEntity | null = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid token.');
+    }
+
+    return this.mapUser(user);
+  }
+
   private createTokenResponse(user: UserEntity): AuthTokenResponse {
     const accessToken: string = this.jwtService.sign({
       sub: user.id,

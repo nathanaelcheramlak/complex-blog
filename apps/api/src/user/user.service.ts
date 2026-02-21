@@ -11,6 +11,22 @@ export class UserService {
     private readonly userRepo: Repository<UserEntity>,
   ) {}
 
+  async createUser(input: {
+    readonly name: string;
+    readonly email: string;
+    readonly hashedPassword: string;
+    readonly avatarUrl: string | null;
+  }): Promise<UserEntity> {
+    const user: UserEntity = this.userRepo.create({
+      name: input.name,
+      email: input.email,
+      password: input.hashedPassword,
+      avatar: input.avatarUrl,
+    });
+
+    return this.userRepo.save(user);
+  }
+
   async findByIdentifier(identifier: string): Promise<UserEntity | null> {
     // Better use table indexing with SQLite built-in collation called  'NOCASE'
     // performance boost from O(n) to O(log n)

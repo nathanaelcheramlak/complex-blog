@@ -96,21 +96,22 @@ export class PostService {
     const limit = input.limit ?? 20;
     const skip = (page - 1) * limit;
 
-    const query = this.postRepo.createQueryBuilder('posts');
+    const queryBuilder = this.postRepo
+      .createQueryBuilder('posts')
+      .leftJoinAndSelect('posts.tags', 'tags')
+      .leftJoin('posts.user', 'user')
+      .addSelect(['user.id', 'user.name', 'user.avatar']);
 
     if (input.tag) {
       const tags = input.tag.split(',');
-      query
-        .innerJoinAndSelect('posts.tags', 'tag')
-        .where('tag.name IN (:...tags)', { tags: tags });
+      queryBuilder.andWhere('tags.name IN (:...tags)', { tags });
     }
 
-    // different ordering will be implemented later
+    queryBuilder.skip(skip).take(limit);
 
-    const [posts, total]: [PostEntity[], number] = await query
-      .skip(skip)
-      .limit(limit)
-      .getManyAndCount();
+    // ordering will be implemented later
+
+    const [posts, total] = await queryBuilder.getManyAndCount();
 
     return {
       data: posts,

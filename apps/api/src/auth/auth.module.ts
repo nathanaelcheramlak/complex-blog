@@ -12,7 +12,7 @@ import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
   imports: [
     ConfigModule,
     UserModule,
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -28,5 +28,6 @@ import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtAuthGuard, JwtStrategy],
+  exports: [JwtAuthGuard, JwtStrategy],
 })
 export class AuthModule {}

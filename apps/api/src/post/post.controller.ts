@@ -97,7 +97,7 @@ export class PostController {
     return this.postService.listPosts({ ...paginationQueryDto });
   }
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Create a new post' })
@@ -109,7 +109,7 @@ export class PostController {
     return this.postService.createPost(userId, body);
   }
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a post' })
@@ -123,7 +123,7 @@ export class PostController {
     return this.postService.updatePost(userId, id, body);
   }
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')

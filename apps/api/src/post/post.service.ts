@@ -22,7 +22,9 @@ export class PostService {
   constructor(
     @InjectRepository(PostEntity)
     private readonly postRepo: Repository<PostEntity>,
+    @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
+    @InjectRepository(TagEntity)
     private readonly tagRepo: Repository<TagEntity>,
   ) {}
 
@@ -30,13 +32,24 @@ export class PostService {
     const user: UserEntity | null = await this.userRepo.findOneBy({
       id: userId,
     });
-    const existingPost: PostEntity | null = await this.postRepo.findOne({
-      where: { title: input.title },
-    });
 
     if (!user) {
       throw new UnauthorizedException('Invalid token.');
     }
+
+    if (input.slug) {
+      const existingSlug: PostEntity | null = await this.postRepo.findOne({
+        where: { slug: input.slug },
+      });
+
+      if (existingSlug) {
+        throw new ConflictException('Slug already exists.');
+      }
+    }
+
+    const existingPost: PostEntity | null = await this.postRepo.findOne({
+      where: { title: input.title },
+    });
 
     if (existingPost) {
       throw new ConflictException('Post already exists.');
@@ -121,6 +134,16 @@ export class PostService {
 
     if (post.user.id !== userId) {
       throw new ForbiddenException('Not the post owner.');
+    }
+
+    if (input.slug) {
+      const existingSlug: PostEntity | null = await this.postRepo.findOne({
+        where: { slug: input.slug },
+      });
+
+      if (existingSlug && existingSlug.id !== postId) {
+        throw new ConflictException('Slug already exists.');
+      }
     }
 
     if (input.tagIds) {

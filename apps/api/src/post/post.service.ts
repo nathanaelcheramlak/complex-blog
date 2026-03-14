@@ -76,9 +76,13 @@ export class PostService {
   }
 
   async getPostById(postId: number): Promise<PostEntity> {
-    const post: PostEntity | null = await this.postRepo.findOne({
-      where: { id: postId },
-    });
+    const post: PostEntity | null = await this.postRepo
+      .createQueryBuilder('posts')
+      .leftJoinAndSelect('posts.tags', 'tags')
+      .leftJoin('posts.user', 'user')
+      .addSelect(['user.id', 'user.name', 'user.avatar'])
+      .where('posts.id = :id', { id: postId })
+      .getOne();
 
     if (!post) {
       throw new NotFoundException('Post not found.');

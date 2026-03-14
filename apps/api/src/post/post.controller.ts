@@ -28,12 +28,17 @@ import { CommentService } from 'src/comment/comment.service';
 import { CreateCommentDto } from 'src/comment/dtos/create-comment.dto';
 import { CommentEntity } from 'src/comment/entities/comment.entity';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { CursorPaginationDto } from 'src/common/dto/cursor-pagination.dto';
+import {
+  CursorPaginatedRespose,
+  CursorPaginationDto,
+} from 'src/common/dto/cursor-pagination.dto';
 import {
   PaginatedResponse,
   PaginationMeta,
   PaginationQueryDto,
 } from 'src/common/dto/pagination.dto';
+import { LikeEntity } from 'src/like/entities/like.entity';
+import { LikeService } from 'src/like/like.service';
 import { CreatePostDto } from 'src/post/dtos/create-post.dto';
 import { UpdatePostDto } from 'src/post/dtos/update-post.dto';
 import { PostEntity } from 'src/post/entities/post.entity';
@@ -60,6 +65,7 @@ export class PostController {
   public constructor(
     private readonly postService: PostService,
     private readonly commentService: CommentService,
+    private readonly likeService: LikeService,
   ) {}
 
   @Get(':id')
@@ -163,7 +169,7 @@ export class PostController {
   async getComments(
     @Param('postId') postId: number,
     @Query() cursorPaginationDto: CursorPaginationDto,
-  ) {
+  ): Promise<CursorPaginatedRespose<CommentEntity>> {
     return this.commentService.getcommentsByPost(postId, cursorPaginationDto);
   }
 
@@ -182,5 +188,49 @@ export class PostController {
     @Body() body: CreateCommentDto,
   ): Promise<CommentEntity> {
     return this.commentService.createComment(postId, userId, body);
+  }
+
+  /*
+   * Likes per post
+   */
+  @Get(':postId/likes')
+  @ApiOperation({ summary: 'Get like count for a post' })
+  @ApiParam({ name: 'postId', type: Number, description: 'Post ID' })
+  @ApiOkResponse({ description: 'Number of likes', type: Number })
+  async getLikes(@Param('postId') postId: number): Promise<number> {
+    return this.likeService.getLikeByPost(postId);
+  }
+
+  /*
+   * create like
+   */
+  @ApiBearerAuth('jwt')
+  @UseGuards(JwtAuthGuard)
+  @Post(':postId/likes')
+  @ApiOperation({ summary: 'Like a post' })
+  @ApiParam({ name: 'postId', type: Number, description: 'Post ID' })
+  @ApiOkResponse({ description: 'Post liked' })
+  async createLike(
+    @CurrentUser('userId') userId: number,
+    @Param('postId') postId: number,
+  ): Promise<LikeEntity> {
+    return this.likeService.createLike(userId, postId);
+  }
+
+  /*
+   * delete like
+   */
+  @ApiBearerAuth('jwt')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete(':postId/likes')
+  @ApiOperation({ summary: 'Unlike a post' })
+  @ApiParam({ name: 'postId', type: Number, description: 'Post ID' })
+  @ApiNoContentResponse({ description: 'Like removed' })
+  async deleteLike(
+    @CurrentUser('userId') userId: number,
+    @Param('postId') postId: number,
+  ): Promise<void> {
+    return this.likeService.deleteLike(userId, postId);
   }
 }

@@ -10,8 +10,6 @@ import {
   Post,
   Query,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -26,7 +24,11 @@ import {
 } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CommentService } from 'src/comment/comment.service';
+import { CreateCommentDto } from 'src/comment/dtos/create-comment.dto';
+import { CommentEntity } from 'src/comment/entities/comment.entity';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { CursorPaginationDto } from 'src/common/dto/cursor-pagination.dto';
 import {
   PaginatedResponse,
   PaginationMeta,
@@ -55,7 +57,10 @@ class ListPostsDto extends PaginationQueryDto {
 @ApiTags('Posts')
 @Controller('posts')
 export class PostController {
-  public constructor(private readonly postService: PostService) {}
+  public constructor(
+    private readonly postService: PostService,
+    private readonly commentService: CommentService,
+  ) {}
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a post by ID' })
@@ -89,7 +94,6 @@ export class PostController {
     description: 'List of posts with pagination metadata',
     type: PaginatedPostsResponse,
   })
-  @UsePipes(new ValidationPipe({ forbidNonWhitelisted: false }))
   async listBlogs(
     @Query()
     paginationQueryDto: ListPostsDto,
@@ -135,5 +139,48 @@ export class PostController {
     @Param('id') id: number,
   ): Promise<void> {
     return this.postService.deletePost(userId, id);
+  }
+
+  /*
+   * Comments per post id
+   */
+  @Get(':postId/comments')
+  @ApiOperation({ summary: 'Get comments for a post' })
+  @ApiParam({ name: 'postId', type: Number, description: 'Post ID' })
+  @ApiQuery({
+    name: 'cursor',
+    type: String,
+    required: false,
+    description: 'Cursor for pagination (format: ISO_DATE_ID)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items to return (max 15)',
+  })
+  @ApiOkResponse({ description: 'List of comments with pagination cursor' })
+  async getComments(
+    @Param('postId') postId: number,
+    @Query() cursorPaginationDto: CursorPaginationDto,
+  ) {
+    return this.commentService.getcommentsByPost(postId, cursorPaginationDto);
+  }
+
+  /*
+   * create comment
+   */
+  @ApiBearerAuth('jwt')
+  @UseGuards(JwtAuthGuard)
+  @Post(':postId/comments')
+  @ApiOperation({ summary: 'Create a comment for a post' })
+  @ApiParam({ name: 'postId', type: Number, description: 'Post ID' })
+  @ApiCreatedResponse({ description: 'Comment created', type: CommentEntity })
+  async createComment(
+    @CurrentUser('userId') userId: number,
+    @Param('postId') postId: number,
+    @Body() body: CreateCommentDto,
+  ): Promise<CommentEntity> {
+    return this.commentService.createComment(postId, userId, body);
   }
 }

@@ -72,7 +72,21 @@ export class PostService {
       post.tags = tags;
     }
 
-    return this.postRepo.save(post);
+    await this.postRepo.save(post);
+
+    const createdPost: PostEntity | null = await this.postRepo
+      .createQueryBuilder('posts')
+      .leftJoinAndSelect('posts.tags', 'tags')
+      .leftJoin('posts.user', 'user')
+      .addSelect(['user.id', 'user.name', 'user.avatar'])
+      .where('posts.id = :id', { id: post.id })
+      .getOne();
+
+    if (!createdPost) {
+      throw new NotFoundException('Post not found.');
+    }
+
+    return createdPost;
   }
 
   async getPostById(postId: number): Promise<PostEntity> {
@@ -165,7 +179,21 @@ export class PostService {
 
     const updatedPost: PostEntity = this.postRepo.merge(post, { ...input });
 
-    return this.postRepo.save(updatedPost);
+    await this.postRepo.save(updatedPost);
+
+    const result: PostEntity | null = await this.postRepo
+      .createQueryBuilder('posts')
+      .leftJoinAndSelect('posts.tags', 'tags')
+      .leftJoin('posts.user', 'user')
+      .addSelect(['user.id', 'user.name', 'user.avatar'])
+      .where('posts.id = :id', { id: postId })
+      .getOne();
+
+    if (!result) {
+      throw new NotFoundException('Post not found.');
+    }
+
+    return result;
   }
 
   async deletePost(userId: number, postId: number): Promise<void> {

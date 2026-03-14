@@ -1,8 +1,8 @@
-import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -10,9 +10,9 @@ import {
 
 export class CreatePostDto {
   @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   @MaxLength(255)
-  @Optional()
   readonly slug?: string;
 
   @ApiProperty({ example: 'My Post Title' })
@@ -27,17 +27,17 @@ export class CreatePostDto {
   readonly content!: string;
 
   @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  @Optional()
   readonly thumbnail?: string;
 
   @ApiProperty({ example: false, required: false })
+  @IsOptional()
   @IsBoolean()
-  @Optional()
   readonly published?: boolean;
 
   @ApiProperty({ example: [1, 2], required: false })
+  @IsOptional()
   @IsNumber({}, { each: true })
-  @Optional()
   readonly tagIds?: number[];
 }

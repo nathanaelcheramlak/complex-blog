@@ -1,8 +1,8 @@
-import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -10,36 +10,36 @@ import {
 
 export class UpdatePostDto {
   @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   @MaxLength(255)
-  @Optional()
   readonly slug?: string;
 
   @ApiProperty({ required: false, example: 'Updated Title' })
+  @IsOptional()
   @IsString()
   @MinLength(3)
   @MaxLength(255)
-  @Optional()
   readonly title?: string;
 
   @ApiProperty({ required: false, example: 'Updated content...' })
+  @IsOptional()
   @IsString()
   @MinLength(5)
-  @Optional()
   readonly content?: string;
 
   @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  @Optional()
   readonly thumbnail?: string;
 
   @ApiProperty({ required: false, example: true })
+  @IsOptional()
   @IsBoolean()
-  @Optional()
   readonly published?: boolean;
 
   @ApiProperty({ example: [1, 2, 3], required: false })
+  @IsOptional()
   @IsNumber({}, { each: true })
-  @Optional()
   readonly tagIds?: number[];
 }

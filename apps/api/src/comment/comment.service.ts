@@ -95,7 +95,6 @@ export class CommentService {
   }
 
   async createComment(
-    postId: number,
     userId: number,
     input: CreateCommentDto,
   ): Promise<CommentEntity> {
@@ -103,7 +102,7 @@ export class CommentService {
       id: userId,
     });
     const post: PostEntity | null = await this.postRepo.findOneBy({
-      id: postId,
+      id: input.postId,
     });
 
     if (!user) {

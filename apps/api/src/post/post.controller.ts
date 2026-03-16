@@ -25,7 +25,6 @@ import {
 import { IsOptional, IsString } from 'class-validator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CommentService } from 'src/comment/comment.service';
-import { CreateCommentDto } from 'src/comment/dtos/create-comment.dto';
 import { CommentEntity } from 'src/comment/entities/comment.entity';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import {
@@ -171,23 +170,6 @@ export class PostController {
     @Query() cursorPaginationDto: CursorPaginationDto,
   ): Promise<CursorPaginatedRespose<CommentEntity>> {
     return this.commentService.getcommentsByPost(postId, cursorPaginationDto);
-  }
-
-  /*
-   * create comment
-   */
-  @ApiBearerAuth('jwt')
-  @UseGuards(JwtAuthGuard)
-  @Post(':postId/comments')
-  @ApiOperation({ summary: 'Create a comment for a post' })
-  @ApiParam({ name: 'postId', type: Number, description: 'Post ID' })
-  @ApiCreatedResponse({ description: 'Comment created', type: CommentEntity })
-  async createComment(
-    @CurrentUser('userId') userId: number,
-    @Param('postId') postId: number,
-    @Body() body: CreateCommentDto,
-  ): Promise<CommentEntity> {
-    return this.commentService.createComment(postId, userId, body);
   }
 
   /*

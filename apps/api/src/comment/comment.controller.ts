@@ -7,10 +7,12 @@ import {
   HttpStatus,
   Param,
   Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -19,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CommentService } from 'src/comment/comment.service';
+import { CreateCommentDto } from 'src/comment/dtos/create-comment.dto';
 import { UpdateCommentDto } from 'src/comment/dtos/update-comment.dto';
 import { CommentEntity } from 'src/comment/entities/comment.entity';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -34,6 +37,18 @@ export class CommentController {
   @ApiOkResponse({ description: 'Comment found', type: CommentEntity })
   async getCommentById(@Param('id') id: number): Promise<CommentEntity> {
     return this.commentService.getCommentById(id);
+  }
+
+  @Post()
+  @ApiBearerAuth('jwt')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Create a comment for a post' })
+  @ApiCreatedResponse({ description: 'Comment created', type: CommentEntity })
+  async createComment(
+    @CurrentUser('userId') userId: number,
+    @Body() body: CreateCommentDto,
+  ): Promise<CommentEntity> {
+    return this.commentService.createComment(userId, body);
   }
 
   @ApiBearerAuth('jwt')

@@ -138,6 +138,32 @@ export class PostService {
     };
   }
 
+  async getRelatedPosts(
+    postId: number,
+    limit: number = 5,
+  ): Promise<PostEntity[]> {
+    const post: PostEntity | null = await this.postRepo.findOne({
+      where: { id: postId },
+      relations: ['tags'],
+    });
+
+    if (!post || !post.tags.length) {
+      return [];
+    }
+
+    const tagIds = post.tags.map((t) => t.id);
+
+    return this.postRepo
+      .createQueryBuilder('post')
+      .leftJoin('post.tags', 'tag')
+      .where('tag.id IN (:...tagIds)', { tagIds })
+      .andWhere('post.id != :postId', { postId })
+      .andWhere('post.published = :published', { published: true })
+      .orderBy('post.createdAt', 'DESC')
+      .limit(limit)
+      .getMany();
+  }
+
   async updatePost(
     userId: number,
     postId: number,

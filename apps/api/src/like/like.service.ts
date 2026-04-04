@@ -39,6 +39,14 @@ export class LikeService {
     return count;
   }
 
+  async hasLiked(userId: number, postId: number): Promise<boolean> {
+    const like = await this.likeRepo.findOne({
+      where: { post: { id: postId }, user: { id: userId } },
+    });
+
+    return !!like;
+  }
+
   async createLike(userId: number, postId: number): Promise<LikeEntity> {
     const user: UserEntity | null = await this.userRepo.findOneBy({
       id: userId,

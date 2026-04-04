@@ -106,6 +106,31 @@ export class PostController {
     return this.postService.listPosts({ ...paginationQueryDto });
   }
 
+  @Get(':id/related')
+  @ApiOperation({ summary: 'Get related posts by tags' })
+  @ApiQuery({ name: 'limit', type: Number, required: false })
+  @ApiOkResponse({ description: 'List of related posts', type: [PostEntity] })
+  async getRelatedPosts(
+    @Param('id') postId: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.postService.getRelatedPosts(postId, limit);
+  }
+
+  @Get(':id/likes/me')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Check if current user liked a post' })
+  @ApiOkResponse({
+    description: 'Returns whether user liked',
+    schema: { example: { liked: true } },
+  })
+  async hasUserLiked(
+    @CurrentUser('userId') userId: number,
+    @Param('id') postId: number,
+  ) {
+    return { liked: await this.likeService.hasLiked(userId, postId) };
+  }
+
   @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   @Post()

@@ -1,5 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UpdateUserDto } from 'src/user/dtos/update-user.dto';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 // import { Brackets } from 'typeorm';
@@ -68,5 +73,33 @@ export class UserService {
 
   async findById(userId: number): Promise<UserEntity | null> {
     return this.userRepo.findOne({ where: { id: userId } });
+  }
+
+  async updateUser(userId: number, input: UpdateUserDto): Promise<UserEntity> {
+    const user: UserEntity | null = await this.userRepo.findOneBy({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invlid token.');
+    }
+
+    const updatedUser: UserEntity = this.userRepo.merge(user, { ...input });
+
+    await this.userRepo.save(updatedUser);
+
+    // avatar update later
+
+    const result: UserEntity | null = await this.userRepo
+      .createQueryBuilder('user')
+      .select(['user.id', 'user.name', 'user.email', 'user.bio', 'user.avatar'])
+      .where('user.id = :id', { id: userId })
+      .getOne();
+
+    if (!result) {
+      throw new InternalServerErrorException('User not found.');
+    }
+
+    return result;
   }
 }

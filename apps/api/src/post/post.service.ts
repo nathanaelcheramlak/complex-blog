@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -190,7 +191,7 @@ export class PostService {
       .getOne();
 
     if (!result) {
-      throw new NotFoundException('Post not found.');
+      throw new InternalServerErrorException('Post not found.');
     }
 
     return result;

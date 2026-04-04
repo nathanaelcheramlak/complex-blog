@@ -1,0 +1,32 @@
+Here’s what already exists and what you could add next.
+Current endpoints (from controllers)
+- GET / health/hello
+- Auth: POST /auth/register, POST /auth/login, GET /auth/me
+- Posts: GET /posts, GET /posts/:id, POST /posts, PATCH /posts/:id, DELETE /posts/:id
+- Post subresources: GET /posts/:postId/comments, GET /posts/:postId/likes, POST /posts/:postId/likes, DELETE /posts/:postId/likes
+- Comments: GET /comments/:id, POST /comments, PATCH /comments/:id, DELETE /comments/:id
+- Tags: GET /tag, GET /tag/:id, POST /tag
+Recommended additions (by typical blog needs)
+- Users
+  - GET /users/:id public profile
+  - PATCH /users/me update profile (avatar/bio)
+  - GET /users/me alias for /auth/me if you want consistency
+- Posts
+  - GET /posts/:id/related (by tags)
+  - GET /posts/:id/likes/me (bool: current user liked)
+  - GET /posts?authorId= filter by author
+  - GET /posts/search?q= full-text search
+- Comments
+  - GET /comments?postId= list via top-level route (optional)
+  - GET /comments?authorId= user’s comments
+- Tags
+  - GET /tags/popular or include count in list
+  - DELETE /tag/:id if tag deletion is allowed
+- Social/engagement (only if in scope)
+  - POST /posts/:id/bookmarks, DELETE /posts/:id/bookmarks, GET /users/me/bookmarks
+  - POST /users/:id/follow, DELETE /users/:id/follow, GET /users/:id/followers, GET /users/:id/following
+- Admin/moderation (if needed)
+  - PATCH /posts/:id/publish, PATCH /posts/:id/feature
+  - DELETE /comments/:id already exists, but add PATCH /comments/:id/approve
+One quick question to narrow this: which product scope are you aiming for right now?
+My recommended default is “public blog with basic auth + discovery,” which would prioritize search, user profiles, and like status per post.

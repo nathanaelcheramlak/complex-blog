@@ -64,6 +64,7 @@ export class UserService {
       .createQueryBuilder('users')
       .where('LOWER(users.email) = LOWER(:identifier)', { identifier })
       .orWhere('LOWER(users.name) = LOWER(:identifier)', { identifier })
+      .addSelect(['users.password'])
       .getOne();
   }
 
@@ -71,8 +72,32 @@ export class UserService {
     return this.userRepo.findOne({ where: { email } });
   }
 
-  async findById(userId: number): Promise<UserEntity | null> {
-    return this.userRepo.findOne({ where: { id: userId } });
+  async findById(userId: number): Promise<UserEntity> {
+    const user: UserEntity | null = await this.userRepo.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid token.');
+    }
+
+    return user;
+  }
+
+  async findByIdForAuth(userId: number): Promise<UserEntity | null> {
+    return this.userRepo.findOne({
+      where: { id: userId },
+      select: [
+        'id',
+        'bio',
+        'name',
+        'email',
+        'password',
+        'avatar',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
   }
 
   async updateUser(userId: number, input: UpdateUserDto): Promise<UserEntity> {

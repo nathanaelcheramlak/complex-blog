@@ -69,10 +69,11 @@ export class AuthService {
   }
 
   async getProfile(userId: number): Promise<AuthTokenResponse['user']> {
-    const user: UserEntity | null = await this.userService.findById(userId);
+    const user: UserEntity | null =
+      await this.userService.findByIdForAuth(userId);
 
     if (!user) {
-      throw new UnauthorizedException('Invalid token.');
+      throw new UnauthorizedException('Invalid credentials.');
     }
 
     return this.mapUser(user);

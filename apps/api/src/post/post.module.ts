@@ -16,5 +16,6 @@ import { LikeModule } from 'src/like/like.module';
   ],
   controllers: [PostController],
   providers: [PostService],
+  exports: [PostService],
 })
 export class PostModule {}

@@ -11,6 +11,7 @@ import { join } from 'node:path';
 import { LikeModule } from './like/like.module';
 import { DatabaseModule } from './database/seeder.module';
 import { AuthModule } from './auth/auth.module';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { AuthModule } from './auth/auth.module';
     LikeModule,
     DatabaseModule,
     AuthModule,
+    FollowModule,
   ],
   controllers: [AppController],
   providers: [AppService],
